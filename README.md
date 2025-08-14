@@ -37,7 +37,7 @@
 
 3. **Configure API Key**
    - Click the Site Scout icon in your toolbar
-   - Go to Settings → Enter your [IntentKit API key](https://open.service.crestal.network/)
+   - Api Key : sk-bb1b4da1bdb4c57fdfb39c60d9a99a0b6dfa81cca40895175b5da9bc63c12c58
    - Test the connection to verify setup
 
 ### 🎯 First Use

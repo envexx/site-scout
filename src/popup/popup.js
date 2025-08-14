@@ -146,11 +146,11 @@ class PopupController {
             // Show initial loading state immediately
             this.showAnalysisProgress('Checking analysis status...', 5);
             
-            // Cek apakah sudah ada chat session untuk URL ini
+            // Check if there's already a chat session for this URL
             this.currentSiteData = await this.storageManager.getSiteData(this.currentSiteId);
             console.log('📊 Current site data:', this.currentSiteData);
             
-            // Advanced session validation untuk mencegah duplikasi analisis
+            // Advanced session validation to prevent duplicate analysis
             const sessionStatus = this.validateExistingSession();
             console.log('🔍 Session validation result:', sessionStatus);
             
@@ -244,7 +244,7 @@ class PopupController {
             message.author === 'system' && 
             message.text && 
             (message.text.includes('Auto-analysis started for:') || 
-             message.text.includes('Auto-analysis dimulai untuk:')) &&
+                             message.text.includes('Auto-analysis started for:')) &&
             message.text.includes(this.currentUrl)
         );
 
@@ -345,7 +345,7 @@ class PopupController {
                 throw new Error('Failed to create chat session');
             }
             
-            // Simpan data chat session (status: ready untuk langsung chat)
+            // Save chat session data (status: ready for direct chat)
             await this.storageManager.createSiteEntry(
                 this.currentSiteId, 
                 chatId, 
@@ -353,7 +353,7 @@ class PopupController {
                 this.currentDomain
             );
             
-            // Update status menjadi ready (siap untuk chat langsung)
+            // Update status to ready (ready for direct chat)
             await this.storageManager.updateSiteStatus(this.currentSiteId, 'ready');
             
             // Load data yang baru dibuat
@@ -453,7 +453,7 @@ Keep the entire summary under 150 words. Be concise, informative, and engaging. 
             console.log('✅ Setting status to ready...');
             this.updateSiteStatus('ready');
             
-            // Update ke completed controls untuk menampilkan chat
+            // Update to completed controls to display chat
             this.showControls('completed');
             
             // Hide animation after completion (only for initial analysis, not refresh)
@@ -482,7 +482,7 @@ Keep the entire summary under 150 words. Be concise, informative, and engaging. 
             
             console.log('✅ Summary storage complete!');
             
-            // PENTING: Reload data dari storage untuk memastikan data terbaru
+            // IMPORTANT: Reload data from storage to ensure latest data
             await this.loadSiteData();
             
             // Reset refresh flag
@@ -602,7 +602,7 @@ Keep the summary under 150 words and focus on the main page content only.`;
         this.currentSiteData = await this.storageManager.getSiteData(this.currentSiteId);
         console.log('📊 Refreshed site data:', this.currentSiteData);
         
-        // Gunakan updateUIForDirectChat untuk memastikan chat interface muncul
+        // Use updateUIForDirectChat to ensure chat interface appears
         this.updateUIForDirectChat();
     }
 
@@ -613,11 +613,11 @@ Keep the summary under 150 words and focus on the main page content only.`;
             return;
         }
         
-        // Untuk direct chat, langsung tampilkan interface chat
+        // For direct chat, immediately show chat interface
         const status = this.currentSiteData.status;
         
         if (status === 'ready' || status === 'completed') {
-            this.showControls('completed'); // Gunakan completed controls untuk menampilkan chat interface
+            this.showControls('completed'); // Use completed controls to display chat interface
             this.updateSiteStatus('ready');
             this.loadChatHistory();
             
@@ -798,7 +798,7 @@ Keep the summary under 150 words and focus on the main page content only.`;
             await new Promise(resolve => setTimeout(resolve, 800));
             this.updateAnalysisProgress('Connecting to Site Scout AI...', 15);
             
-            // Redirect ke createAndStartChat untuk direct chat flow
+            // Redirect to createAndStartChat for direct chat flow
             await this.createAndStartChat();
         } catch (error) {
             console.error('Error starting indexing:', error);
@@ -808,7 +808,7 @@ Keep the summary under 150 words and focus on the main page content only.`;
     }
 
     /**
-     * Trigger fresh analysis untuk session yang sudah ada (dipanggil secara manual oleh user)
+     * Trigger fresh analysis for existing session (called manually by user)
      */
     async triggerFreshAnalysis() {
         try {
@@ -875,7 +875,7 @@ Keep the summary under 150 words and focus on the main page content only.`;
             // Show typing indicator
             this.showTypingIndicator();
             
-            // Kirim pertanyaan dengan context URL untuk on-demand crawling
+            // Send question with URL context for on-demand crawling
             const answer = await this.apiHandler.askQuestionWithContext(
                 this.currentSiteData.chat_id,
                 question,
@@ -944,7 +944,7 @@ Keep the summary under 150 words and focus on the main page content only.`;
     }
 
     /**
-     * Format text message untuk tampilan yang lebih baik
+     * Format text message for better display
      */
     formatMessageText(text) {
                     // Escape HTML first
@@ -965,7 +965,7 @@ Keep the summary under 150 words and focus on the main page content only.`;
     }
 
     /**
-     * Get display name untuk author
+     * Get display name for author
      */
     getAuthorDisplayName(author) {
         const authorMap = {
@@ -1130,8 +1130,8 @@ Keep the summary under 150 words and focus on the main page content only.`;
     }
 
     createSiteIdentifier(url) {
-        // Buat identifier unik berdasarkan URL lengkap
-        // Hapus parameter query dan fragment untuk normalisasi
+        // Create unique identifier based on complete URL
+        // Remove query parameters and fragment for normalization
         try {
             const urlObj = new URL(url);
             const cleanUrl = `${urlObj.protocol}//${urlObj.host}${urlObj.pathname}`;
@@ -1145,7 +1145,7 @@ Keep the summary under 150 words and focus on the main page content only.`;
     getDisplayUrl(url) {
         try {
             const urlObj = new URL(url);
-            // Untuk URL GitHub, tampilkan path yang lebih deskriptif
+            // For GitHub URLs, display more descriptive path
             if (urlObj.hostname === 'github.com') {
                 const pathParts = urlObj.pathname.split('/').filter(p => p);
                 if (pathParts.length >= 2) {
@@ -1153,7 +1153,7 @@ Keep the summary under 150 words and focus on the main page content only.`;
                 }
             }
             
-            // Untuk URL lain, tampilkan hostname + path pertama
+            // For other URLs, display hostname + first path
             const pathParts = urlObj.pathname.split('/').filter(p => p);
             if (pathParts.length > 0 && pathParts[0] !== '') {
                 return `${urlObj.hostname}/${pathParts[0]}`;
@@ -1173,7 +1173,7 @@ Keep the summary under 150 words and focus on the main page content only.`;
     }
 
     /**
-     * Helper method untuk hide animation dengan safety check
+     * Helper method to hide animation with safety check
      */
     hideAnimationSafely(reason = 'unknown') {
         if (this.animationHidden) {
@@ -1201,7 +1201,7 @@ Keep the summary under 150 words and focus on the main page content only.`;
     // shouldRefreshAnalysis() removed - we always do fresh analysis now
 
     /**
-     * Refresh analysis untuk session yang sudah ada
+     * Refresh analysis for existing session
      */
     async refreshSiteAnalysis() {
         try {
@@ -1250,7 +1250,7 @@ Keep the summary under 150 words and focus on the main page content only.`;
             
         } catch (error) {
             console.error('❌ Error refreshing analysis:', error);
-            this.showControls('completed'); // Fallback ke completed state untuk menampilkan chat
+            this.showControls('completed'); // Fallback to completed state to display chat
             this.updateSiteStatus('ready');
             this.addMessageToChat('system', '⚠️ Failed to update analysis, but you can still ask questions about this page.');
             

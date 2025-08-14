@@ -3,7 +3,7 @@
  * Manages background tasks like site indexing and API communication
  */
 
-// Import storage manager untuk komunikasi dengan chrome.storage
+// Import storage manager for communication with chrome.storage
 importScripts('../lib/storage_manager.js', '../lib/api_handler.js');
 
 class BackgroundController {
@@ -21,12 +21,12 @@ class BackgroundController {
             return true; // Akan mengirim response secara asinkron
         });
 
-        // Listen untuk instalasi ekstensi
+        // Listen for extension installation
         chrome.runtime.onInstalled.addListener((details) => {
             this.handleInstallation(details);
         });
 
-        // Listen untuk startup browser
+        // Listen for browser startup
         chrome.runtime.onStartup.addListener(() => {
             this.handleStartup();
         });
@@ -142,8 +142,8 @@ class BackgroundController {
 
     async sendIndexingCommand(siteId, url, chatId, apiHandler) {
         try {
-            // Untuk direct chat flow, kita tidak perlu melakukan indexing di awal
-            // Cukup membuat introduction message untuk memperkenalkan URL context
+            // For direct chat flow, we don't need to do initial indexing
+            // Just create an introduction message to introduce URL context
             const introMessage = `Hi! I'm viewing the page: ${url}. I'm ready to answer questions about the content on this page. Feel free to ask anything!`;
             
             const response = await apiHandler.sendMessage(chatId, introMessage);
@@ -244,7 +244,7 @@ class BackgroundController {
                 timestamp: new Date().toISOString()
             });
 
-            // Analisis response untuk menentukan status
+            // Analyze response to determine status
             const lowerResponse = response.toLowerCase();
             
             if (lowerResponse.includes('pengindeksan selesai') || 
@@ -254,7 +254,7 @@ class BackgroundController {
             }
 
             if (lowerResponse.includes('error') || 
-                lowerResponse.includes('gagal') ||
+                lowerResponse.includes('failed') ||
                 lowerResponse.includes('failed')) {
                 return 'error';
             }
@@ -295,7 +295,7 @@ class BackgroundController {
                     console.log(`Resuming interrupted indexing for ${siteId}`);
                     
                     // Reset status atau lanjutkan tergantung kebutuhan
-                    // Untuk sederhananya, kita reset ke idle
+                    // For simplicity, we reset to idle
                     await this.storageManager.updateSiteStatus(siteId, 'idle');
                 }
             }
@@ -323,7 +323,7 @@ class BackgroundController {
         });
     }
 
-    // Utility method untuk logging dengan timestamp
+            // Utility method for logging with timestamp
     log(message, ...args) {
         console.log(`[${new Date().toISOString()}] ${message}`, ...args);
     }

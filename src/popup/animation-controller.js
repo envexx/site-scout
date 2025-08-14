@@ -2,7 +2,7 @@
  * Animation Controller - Mengontrol loading animation overlay dengan RobotLoader
  */
 
-// Animation control untuk loading overlay
+// Animation control for loading overlay
 class AnimationController {
     constructor() {
         this.robotLoader = new RobotLoader();
@@ -24,7 +24,7 @@ class AnimationController {
     }
     
     async init() {
-        // Preload animation untuk performa yang lebih baik
+        // Preload animation for better performance
         await this.robotLoader.preload();
         
         // Show animation immediately when popup opens

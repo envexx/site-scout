@@ -1,6 +1,6 @@
 /**
  * Robot Loading Animation Loader
- * Mengelola pemuatan dan kontrol animasi robot loading secara dinamis
+ * Manages loading and control of robot loading animation dynamically
  */
 
 class RobotLoader {
@@ -11,7 +11,7 @@ class RobotLoader {
     }
 
     /**
-     * Memuat konten animasi robot dari file HTML terpisah
+     * Loads robot animation content from separate HTML file
      */
     async loadRobotAnimation() {
         if (this.isLoaded) return;
@@ -21,7 +21,7 @@ class RobotLoader {
             
             // CSS sudah ada di popup.html sebagai inline styles, tidak perlu inject external CSS
             
-            // Fetch konten HTML animasi robot
+            // Fetch robot animation HTML content
             const response = await fetch(chrome.runtime.getURL('src/popup/robot-loading.html'));
             const htmlContent = await response.text();
             
@@ -46,7 +46,7 @@ class RobotLoader {
 
 
     /**
-     * Membuat loader fallback sederhana jika gagal memuat animasi robot
+     * Creates a simple fallback loader if robot animation fails to load
      */
     createFallbackLoader() {
         console.log('🔄 Creating fallback loader...');
@@ -92,7 +92,7 @@ class RobotLoader {
             console.log('🎬 Hiding robot loading animation');
             this.loadingOverlay.classList.add('hidden');
             
-            // Delay untuk transisi
+            // Delay for transition
             setTimeout(() => {
                 if (this.loadingOverlay) {
                     this.loadingOverlay.style.display = 'none';
@@ -135,7 +135,7 @@ class RobotLoader {
     }
 
     /**
-     * Force hide dengan menghapus element
+     * Force hide by removing element
      */
     forceHide() {
         if (this.loadingOverlay) {
@@ -150,7 +150,7 @@ class RobotLoader {
     }
 
     /**
-     * Preload animasi untuk performa yang lebih baik
+     * Preload animation for better performance
      */
     async preload() {
         if (!this.isLoaded) {
@@ -164,5 +164,5 @@ class RobotLoader {
     }
 }
 
-// Export untuk digunakan di file lain
+        // Export for use in other files
 window.RobotLoader = RobotLoader;

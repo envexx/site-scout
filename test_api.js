@@ -1,9 +1,9 @@
 /**
- * Test Script untuk IntentKit Agent API
- * Menguji apakah API handler bekerja dengan benar
+ * Test Script for IntentKit Agent API
+ * Tests whether the API handler works correctly
  */
 
-// Simulasi API Handler untuk testing di Node.js
+// Simulate API Handler for testing in Node.js
 class ApiHandler {
     constructor(apiKey) {
         this.apiKey = apiKey;
@@ -88,11 +88,11 @@ class ApiHandler {
 
     async askQuestionWithContext(chatId, question, url) {
         try {
-            const contextualMessage = `Untuk menjawab pertanyaan berikut, silakan gunakan skill 'web_crawler.crawl_and_index_website' untuk menganalisis konten dari: ${url}
+            const contextualMessage = `To answer the following question, please use the 'web_crawler.crawl_and_index_website' skill to analyze content from: ${url}
 
-Pertanyaan: ${question}
+Question: ${question}
 
-Mohon berikan jawaban yang akurat berdasarkan konten dari URL tersebut.`;
+Please provide an accurate answer based on the content from that URL.`;
             
             return await this.sendMessage(chatId, contextualMessage);
         } catch (error) {
@@ -182,7 +182,7 @@ if (typeof window === 'undefined') {
     console.log('Use runTests() function to start testing');
 }
 
-// Export untuk penggunaan di browser
+// Export for browser usage
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = { ApiHandler, runTests };
 } else if (typeof window !== 'undefined') {

@@ -1,0 +1,64 @@
+<!-- Modern Minimalist Robot Loading Animation Component -->
+<div class="loading-container">
+    <div class="robot-container">
+        <!-- Subtle orbital particles -->
+        <div class="energy-particle"></div>
+        <div class="energy-particle"></div>
+        <div class="energy-particle"></div>
+        <div class="energy-particle"></div>
+        
+        <!-- Main robot body inspired by the logo -->
+        <div class="chat-bubble">
+            <div class="robot-face">
+                <div class="robot-eyes">
+                    <div class="robot-eye"></div>
+                    <div class="robot-eye"></div>
+                </div>
+                <div class="robot-mouth"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="loading-animation-text">
+        <h1 class="loading-animation-title">Site Scout AI</h1>
+        <p class="loading-animation-subtitle">AI-Powered Web Analysis</p>
+    </div>
+    
+    <div class="progress-container-animation">
+        <div class="progress-bar-animation"></div>
+    </div>
+    
+    <div class="status-text-animation" id="animationStatusText">Initializing...</div>
+</div>
+
+<script>
+// Dynamic status text changes with smoother transitions
+const statusTexts = [
+    "Initializing...",
+    "Loading AI modules...",
+    "Connecting to servers...",
+    "Analyzing web patterns...",
+    "Preparing insights...",
+    "Ready to scout!"
+];
+
+let currentIndex = 0;
+const statusElement = document.getElementById('animationStatusText');
+
+function updateStatus() {
+    // Add fade effect
+    statusElement.style.opacity = '0.3';
+    
+    setTimeout(() => {
+        statusElement.textContent = statusTexts[currentIndex];
+        statusElement.style.opacity = '1';
+        currentIndex = (currentIndex + 1) % statusTexts.length;
+    }, 300);
+}
+
+// Change status text every 2.5 seconds for smoother experience
+setInterval(updateStatus, 2500);
+
+// Add smooth transition to status text
+statusElement.style.transition = 'opacity 0.3s ease-in-out';
+</script>

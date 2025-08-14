@@ -1,0 +1,162 @@
+<!-- Analysis Loading Animation Component -->
+<div class="analysis-loading-container">
+    <div class="analysis-animation">
+        <!-- AI Brain Animation -->
+        <div class="brain-animation">
+            <div class="brain-particle"></div>
+            <div class="brain-particle"></div>
+            <div class="brain-particle"></div>
+            <svg class="brain-icon" viewBox="0 0 24 24" width="48" height="48">
+                <path d="M12 3C7.58 3 4 6.58 4 11c0 2.52 1.16 4.76 2.97 6.24L12 21l5.03-3.76C18.84 15.76 20 13.52 20 11c0-4.42-3.58-8-8-8z"/>
+            </svg>
+        </div>
+    </div>
+    
+    <div class="analysis-status">
+        <h2 class="status-title">Site Scout AI</h2>
+        <p class="status-message" id="analysisStatusText">Starting analysis...</p>
+    </div>
+    
+    <div class="analysis-progress-bar">
+        <div class="progress-track">
+            <div class="progress-fill" id="analysisProgressBar"></div>
+        </div>
+        <div class="progress-percentage" id="analysisProgressText">0%</div>
+    </div>
+</div>
+
+<style>
+.analysis-loading-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    z-index: 1000;
+}
+
+.analysis-animation {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.brain-animation {
+    position: relative;
+    width: 80px;
+    height: 80px;
+}
+
+.brain-icon {
+    fill: #4a90e2;
+    animation: pulse 2s infinite;
+}
+
+.brain-particle {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: #4a90e2;
+    border-radius: 50%;
+    opacity: 0;
+}
+
+.brain-particle:nth-child(1) {
+    top: 0;
+    left: 50%;
+    animation: particle1 3s infinite;
+}
+
+.brain-particle:nth-child(2) {
+    top: 50%;
+    right: 0;
+    animation: particle2 3s infinite;
+}
+
+.brain-particle:nth-child(3) {
+    bottom: 0;
+    left: 50%;
+    animation: particle3 3s infinite;
+}
+
+.analysis-status {
+    text-align: center;
+}
+
+.status-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin: 0 0 8px 0;
+}
+
+.status-message {
+    font-size: 16px;
+    color: #666;
+    margin: 0;
+}
+
+.analysis-progress-bar {
+    width: 80%;
+    max-width: 300px;
+    margin-top: 16px;
+}
+
+.progress-track {
+    height: 6px;
+    background: #e0e0e0;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: #4a90e2;
+    width: 0%;
+    border-radius: 3px;
+    transition: width 0.3s ease-out;
+}
+
+.progress-percentage {
+    text-align: center;
+    font-size: 14px;
+    color: #666;
+    margin-top: 8px;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 0.8; }
+    50% { transform: scale(1.1); opacity: 1; }
+    100% { transform: scale(1); opacity: 0.8; }
+}
+
+@keyframes particle1 {
+    0% { transform: translateY(0); opacity: 0; }
+    20% { transform: translateY(20px); opacity: 1; }
+    40% { transform: translateY(40px); opacity: 0; }
+    100% { transform: translateY(40px); opacity: 0; }
+}
+
+@keyframes particle2 {
+    0% { transform: translateX(0); opacity: 0; }
+    20% { transform: translateX(-20px); opacity: 1; }
+    40% { transform: translateX(-40px); opacity: 0; }
+    100% { transform: translateX(-40px); opacity: 0; }
+}
+
+@keyframes particle3 {
+    0% { transform: translateY(0); opacity: 0; }
+    20% { transform: translateY(-20px); opacity: 1; }
+    40% { transform: translateY(-40px); opacity: 0; }
+    100% { transform: translateY(-40px); opacity: 0; }
+}
+</style>

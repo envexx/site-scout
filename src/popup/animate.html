@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Site Scout - Loading</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-blue: #2563eb;
+            --primary-cyan: #00d4ff;
+            --primary-purple: #6366f1;
+            --accent-pink: #ec4899;
+            --accent-orange: #f97316;
+            --bg-dark: #0a0a0f;
+            --bg-secondary: #1a1a2e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a9c0;
+            --text-glow: #00d4ff;
+            --robot-gradient: linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #1e40af 100%);
+            --energy-gradient: linear-gradient(90deg, #00d4ff 0%, #ec4899 50%, #f97316 100%);
+            --circuit-color: rgba(0, 212, 255, 0.6);
+            --bubble-shadow: 0 20px 40px rgba(37, 99, 235, 0.3);
+        }
+
+        body {
+            font-family: 'Orbitron', monospace;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            width: 380px;
+            height: 600px;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Animated Background */
+        .bg-animation {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 30% 30%, rgba(37, 99, 235, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 70% 70%, rgba(99, 102, 241, 0.12) 0%, transparent 50%),
+                radial-gradient(circle at 50% 20%, rgba(0, 212, 255, 0.08) 0%, transparent 50%);
+            animation: bgPulse 4s ease-in-out infinite alternate;
+        }
+
+        @keyframes bgPulse {
+            0% { opacity: 0.4; }
+            100% { opacity: 0.8; }
+        }
+
+        /* Circuit Pattern */
+        .circuit-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(90deg, var(--circuit-color) 1px, transparent 1px),
+                linear-gradient(0deg, var(--circuit-color) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.08;
+            animation: circuitMove 12s linear infinite;
+        }
+
+        @keyframes circuitMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(40px, 40px); }
+        }
+
+        /* Main Container */
+        .loading-container {
+            text-align: center;
+            z-index: 10;
+            position: relative;
+        }
+
+        /* Robot Chat Bubble Container */
+        .robot-container {
+            position: relative;
+            margin-bottom: 40px;
+            animation: robotFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes robotFloat {
+            0%, 100% { transform: translateY(0px) scale(1); }
+            50% { transform: translateY(-12px) scale(1.02); }
+        }
+
+        /* Chat Bubble Base */
+        .chat-bubble {
+            position: relative;
+            width: 160px;
+            height: 120px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 50px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--bubble-shadow);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(37, 99, 235, 0.2);
+            animation: bubbleGlow 2.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes bubbleGlow {
+            0% { 
+                box-shadow: var(--bubble-shadow);
+                border-color: rgba(37, 99, 235, 0.2);
+            }
+            100% { 
+                box-shadow: 0 25px 50px rgba(37, 99, 235, 0.5);
+                border-color: rgba(37, 99, 235, 0.4);
+            }
+        }
+
+        /* Chat Bubble Tail */
+        .chat-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 30px;
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 20px solid rgba(255, 255, 255, 0.95);
+            filter: drop-shadow(0 5px 10px rgba(37, 99, 235, 0.2));
+        }
+
+        /* Robot Face Inside Bubble */
+        .robot-face {
+            position: relative;
+            width: 80px;
+            height: 60px;
+        }
+
+        /* Robot Eyes */
+        .robot-eyes {
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 24px;
+        }
+
+        .robot-eye {
+            width: 16px;
+            height: 16px;
+            background: var(--primary-blue);
+            border-radius: 50%;
+            box-shadow: 
+                0 0 20px rgba(37, 99, 235, 0.6),
+                inset 0 0 8px rgba(255, 255, 255, 0.3);
+            animation: eyeBlink 3.5s ease-in-out infinite;
+            position: relative;
+        }
+
+        .robot-eye::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 6px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            animation: eyeShine 2s ease-in-out infinite;
+        }
+
+        @keyframes eyeBlink {
+            0%, 85%, 90%, 95%, 100% { 
+                transform: scaleY(1); 
+                opacity: 1; 
+            }
+            87%, 92% { 
+                transform: scaleY(0.1); 
+                opacity: 0.7; 
+            }
+        }
+
+        @keyframes eyeShine {
+            0%, 50%, 100% { opacity: 0.8; }
+            25%, 75% { opacity: 1; }
+        }
+
+        /* Robot Mouth/Expression */
+        .robot-mouth {
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 32px;
+            height: 12px;
+            border: 2px solid var(--primary-blue);
+            border-top: none;
+            border-radius: 0 0 16px 16px;
+            animation: mouthTalk 2s ease-in-out infinite;
+        }
+
+        @keyframes mouthTalk {
+            0%, 100% { 
+                transform: translateX(-50%) scaleY(1);
+                border-width: 2px;
+            }
+            50% { 
+                transform: translateX(-50%) scaleY(1.5);
+                border-width: 3px;
+            }
+        }
+
+        /* Energy Particles Around Bubble */
+        .energy-particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: var(--primary-cyan);
+            border-radius: 50%;
+            box-shadow: 0 0 12px var(--primary-cyan);
+        }
+
+        .energy-particle:nth-child(1) {
+            top: 10%;
+            left: -20px;
+            animation: particleOrbit1 4s linear infinite;
+        }
+
+        .energy-particle:nth-child(2) {
+            top: 50%;
+            right: -25px;
+            animation: particleOrbit2 4s linear infinite 1s;
+        }
+
+        .energy-particle:nth-child(3) {
+            bottom: 20%;
+            left: -15px;
+            animation: particleOrbit3 4s linear infinite 2s;
+        }
+
+        .energy-particle:nth-child(4) {
+            top: 20%;
+            right: -20px;
+            animation: particleOrbit4 4s linear infinite 1.5s;
+        }
+
+        @keyframes particleOrbit1 {
+            0% { transform: rotate(0deg) translateX(90px) rotate(0deg); }
+            100% { transform: rotate(360deg) translateX(90px) rotate(-360deg); }
+        }
+
+        @keyframes particleOrbit2 {
+            0% { transform: rotate(90deg) translateX(85px) rotate(-90deg); }
+            100% { transform: rotate(450deg) translateX(85px) rotate(-450deg); }
+        }
+
+        @keyframes particleOrbit3 {
+            0% { transform: rotate(180deg) translateX(80px) rotate(-180deg); }
+            100% { transform: rotate(540deg) translateX(80px) rotate(-540deg); }
+        }
+
+        @keyframes particleOrbit4 {
+            0% { transform: rotate(270deg) translateX(95px) rotate(-270deg); }
+            100% { transform: rotate(630deg) translateX(95px) rotate(-630deg); }
+        }
+
+        /* Scanning Ring */
+        .scan-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 200px;
+            border: 3px solid transparent;
+            border-top: 3px solid var(--primary-cyan);
+            border-radius: 50%;
+            animation: scanRotate 2s linear infinite;
+            opacity: 0.6;
+        }
+
+        @keyframes scanRotate {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        /* Loading Text */
+        .loading-text {
+            margin-bottom: 25px;
+        }
+
+        .loading-title {
+            font-size: 26px;
+            font-weight: 700;
+            background: var(--energy-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            animation: titlePulse 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes titlePulse {
+            0% { filter: drop-shadow(0 0 8px rgba(0, 212, 255, 0.4)); }
+            100% { filter: drop-shadow(0 0 16px rgba(0, 212, 255, 0.8)); }
+        }
+
+        .loading-subtitle {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 35px;
+            opacity: 0;
+            animation: fadeInUp 1s ease-out 0.8s forwards;
+        }
+
+        @keyframes fadeInUp {
+            0% {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            width: 300px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 3px;
+            margin: 0 auto 25px;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid rgba(37, 99, 235, 0.2);
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--robot-gradient);
+            width: 0%;
+            border-radius: 3px;
+            animation: progressFill 5s ease-in-out infinite;
+            position: relative;
+            box-shadow: 0 0 15px rgba(37, 99, 235, 0.5);
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 30px;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8));
+            animation: progressShine 1.2s ease-in-out infinite;
+        }
+
+        @keyframes progressFill {
+            0% { width: 0%; }
+            75% { width: 95%; }
+            100% { width: 100%; }
+        }
+
+        @keyframes progressShine {
+            0% { opacity: 0; transform: translateX(-30px); }
+            50% { opacity: 1; transform: translateX(0); }
+            100% { opacity: 0; transform: translateX(30px); }
+        }
+
+        /* Status Text */
+        .status-text {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: var(--text-glow);
+            text-shadow: 0 0 12px var(--text-glow);
+            animation: statusGlow 2.5s ease-in-out infinite;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        @keyframes statusGlow {
+            0%, 100% { 
+                opacity: 0.8; 
+                text-shadow: 0 0 12px var(--text-glow);
+            }
+            50% { 
+                opacity: 1; 
+                text-shadow: 0 0 20px var(--text-glow), 0 0 30px var(--text-glow);
+            }
+        }
+
+        /* Scanning Lines */
+        .scan-line {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary-cyan), transparent);
+            top: 0;
+            animation: scanMove 4s linear infinite;
+            opacity: 0.4;
+        }
+
+        @keyframes scanMove {
+            0% { top: 0%; opacity: 0; }
+            10% { opacity: 0.8; }
+            90% { opacity: 0.8; }
+            100% { top: 100%; opacity: 0; }
+        }
+
+        /* Data Stream Effect */
+        .data-stream {
+            position: absolute;
+            right: 20px;
+            top: 20%;
+            width: 2px;
+            height: 60%;
+            background: linear-gradient(to bottom, transparent, var(--primary-cyan), transparent);
+            animation: dataFlow 3s linear infinite;
+            opacity: 0.6;
+        }
+
+        .data-stream:nth-child(2) {
+            left: 30px;
+            animation-delay: 1s;
+            background: linear-gradient(to bottom, transparent, var(--accent-pink), transparent);
+        }
+
+        @keyframes dataFlow {
+            0% { transform: translateY(-100%); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateY(100%); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation"></div>
+    <div class="circuit-pattern"></div>
+    <div class="scan-line"></div>
+    <div class="data-stream"></div>
+    <div class="data-stream"></div>
+    
+    <div class="loading-container">
+        <div class="robot-container">
+            <div class="scan-ring"></div>
+            
+            <div class="chat-bubble">
+                <div class="robot-face">
+                    <div class="robot-eyes">
+                        <div class="robot-eye"></div>
+                        <div class="robot-eye"></div>
+                    </div>
+                    <div class="robot-mouth"></div>
+                </div>
+            </div>
+            
+            <!-- Energy particles orbiting the bubble -->
+            <div class="energy-particle"></div>
+            <div class="energy-particle"></div>
+            <div class="energy-particle"></div>
+            <div class="energy-particle"></div>
+        </div>
+        
+        <div class="loading-text">
+            <h1 class="loading-title">Site Scout</h1>
+            <p class="loading-subtitle">AI-Powered Web Analysis</p>
+        </div>
+        
+        <div class="progress-container">
+            <div class="progress-bar"></div>
+        </div>
+        
+        <div class="status-text" id="statusText">Initializing...</div>
+    </div>
+
+    <script>
+        // Status messages in English as requested
+        const statusTexts = [
+            "Initializing...",
+            "Analyzing content...",
+            "Please wait...",
+            "Processing data...",
+            "Analyzing patterns...",
+            "Compiling summary...",
+            "Almost ready...",
+            "Loading complete"
+        ];
+
+        let currentStatusIndex = 0;
+        const statusElement = document.getElementById('statusText');
+
+        function updateStatus() {
+            statusElement.textContent = statusTexts[currentStatusIndex];
+            currentStatusIndex = (currentStatusIndex + 1) % statusTexts.length;
+        }
+
+        // Update status every 700ms for better readability
+        const statusInterval = setInterval(updateStatus, 700);
+
+        // Simulate loading completion and redirect
+        setTimeout(() => {
+            clearInterval(statusInterval);
+            statusElement.textContent = "Ready to scout!";
+            
+            // Add completion animation
+            document.body.style.animation = 'fadeOut 0.8s ease-out forwards';
+            
+            // Redirect to main extension after loading
+            setTimeout(() => {
+                // Replace with actual redirect logic
+                // window.location.href = 'popup.html';
+                console.log('Loading complete - would redirect to main extension');
+            }, 800);
+        }, 5600); // Slightly longer for better UX
+
+        // Add CSS for fade out animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeOut {
+                0% { opacity: 1; transform: scale(1); }
+                100% { opacity: 0; transform: scale(0.95); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Interactive hover effects
+        document.addEventListener('mousemove', (e) => {
+            const bubble = document.querySelector('.chat-bubble');
+            const rect = bubble.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            
+            const deltaX = (e.clientX - centerX) / 20;
+            const deltaY = (e.clientY - centerY) / 20;
+            
+            bubble.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+        });
+
+        // Reset bubble position when mouse leaves
+        document.addEventListener('mouseleave', () => {
+            const bubble = document.querySelector('.chat-bubble');
+            bubble.style.transform = 'translate(0px, 0px)';
+        });
+    </script>
+</body>
+</html>

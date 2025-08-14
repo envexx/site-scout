@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Site Scout Settings</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="settings.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1><img src="../../icons/logo.png" alt="Site Scout AI" width="24" height="24" style="vertical-align: middle"> Site Scout AI</h1>
+            <p>Extension Settings</p>
+        </header>
+
+        <main class="main-content">
+            <!-- API Key Section -->
+            <section class="settings-section">
+                <h2>🔑 API Key</h2>
+                <p class="section-description">
+                    Enter your IntentKit API key to use AI services.
+                    Your API key will be stored locally and never shared.
+                </p>
+                
+                <div class="form-group">
+                    <label for="apiKeyInput">API Key</label>
+                    <div class="input-with-button">
+                        <input 
+                            type="password" 
+                            id="apiKeyInput" 
+                            placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                            autocomplete="off"
+                        >
+                        <button type="button" id="toggleApiKeyBtn" class="toggle-btn" title="Show/Hide">👁️</button>
+                    </div>
+                    <small class="help-text">
+                        Get your API key at <a href="https://open.service.crestal.network" target="_blank">open.service.crestal.network</a>
+                    </small>
+                </div>
+
+                <div class="form-actions">
+                    <button id="saveApiKeyBtn" class="primary-btn">💾 Save API Key</button>
+                    <button id="testApiKeyBtn" class="secondary-btn" disabled>🧪 Test Connection</button>
+                </div>
+
+                <div id="apiKeyStatus" class="status-message hidden"></div>
+            </section>
+
+            <!-- Situs Terindeks Section -->
+            <section class="settings-section">
+                <h2>🌐 Indexed Sites</h2>
+                <p class="section-description">
+                    Manage sites that have been indexed by Site Scout.
+                </p>
+
+                <div id="sitesList" class="sites-list">
+                    <!-- Daftar situs akan dimuat di sini -->
+                </div>
+
+                <div class="form-actions">
+                    <button id="refreshSitesBtn" class="secondary-btn">🔄 Refresh</button>
+                    <button id="clearAllSitesBtn" class="danger-btn">🗑️ Clear All</button>
+                </div>
+            </section>
+
+            <!-- Statistik Section -->
+            <section class="settings-section">
+                <h2>📊 Statistics</h2>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-number" id="totalSites">0</div>
+                        <div class="stat-label">Total Sites</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="totalMessages">0</div>
+                        <div class="stat-label">Total Messages</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="activeSites">0</div>
+                        <div class="stat-label">Active Sites</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tentang Section -->
+            <section class="settings-section">
+                <h2>ℹ️ About</h2>
+                <div class="about-content">
+                    <p><strong>Site Scout v1.0</strong></p>
+                    <p>Web-based Contextual Research Agent</p>
+                    <p>Built for hackathon using IntentKit Agent API</p>
+                    
+                    <div class="links">
+                        <a href="#" id="exportDataBtn">📤 Export Data</a>
+                        <a href="#" id="importDataBtn">📥 Import Data</a>
+                        <a href="#" id="resetAllBtn">🔄 Reset All</a>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Loading Overlay -->
+        <div id="loadingOverlay" class="loading-overlay hidden">
+            <div class="loading-content">
+                <div class="spinner"></div>
+                <p>Processing...</p>
+            </div>
+        </div>
+
+        <!-- Notification -->
+        <div id="notification" class="notification hidden">
+            <span id="notificationText"></span>
+            <button id="closeNotificationBtn" class="close-btn">×</button>
+        </div>
+    </div>
+
+    <!-- Hidden file input for import -->
+    <input type="file" id="fileInput" accept=".json" style="display: none;">
+
+    <!-- Scripts -->
+    <script src="../lib/storage_manager.js"></script>
+    <script src="../lib/api_handler.js"></script>
+    <script src="settings.js"></script>
+</body>
+</html>

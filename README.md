@@ -1,4 +1,4 @@
-# 🕷️ Site Scout AI - Intelligent Web Analysis Extension
+# Site Scout AI - Intelligent Web Analysis Extension
 
 <div align="center">
   <img src="icons/logo.png" alt="Site Scout AI Logo" width="200" height="200">
@@ -198,46 +198,7 @@ User Question → Context Analysis → nation.fun AI Processing → Response Gen
 - **Content Summarization**: Get AI-generated summaries of long articles
 - **Research Assistant**: Intelligent help for any web-based research
 
-## 🛠️ Development
 
-### 🚀 Setup Development Environment
-
-```bash
-# Download from Google Drive
-# 1. Visit: https://drive.google.com/drive/folders/1rWhn8ccg27s1tRLSJnhXF5V6kJS8kGpu
-# 2. Download site-scout-nation.zip
-# 3. Extract to your desired location
-
-# Install dependencies (if developing)
-npm install
-
-# Load extension in Chrome
-# 1. Open chrome://extensions/
-# 2. Enable "Developer mode"
-# 3. Click "Load unpacked" → select extracted 'site-scout' folder
-```
-
-### 🔑 API Configuration
-
-1. **Get nation.fun API Key**
-   - Visit [nation.fun](https://nation.fun)
-   - Sign up and generate your API key
-
-2. **Configure Extension**
-   - Open Site Scout settings
-   - Enter your nation.fun API key
-   - Test connection to verify setup
-
-### 🧪 Testing
-
-```bash
-# Test extension functionality
-1. Load extension in Chrome
-2. Navigate to different websites
-3. Test analysis and chat features
-4. Verify error handling scenarios
-5. Check responsive design on different screen sizes
-```
 
 ## 📊 Performance Metrics
 
@@ -276,82 +237,11 @@ npm install
 }
 ```
 
-## 🐛 Troubleshooting
 
-### 🔧 **Common Issues & Solutions**
 
-| Issue | Solution |
-|-------|----------|
-| **Extension not loading** | Check manifest.json syntax, reload extension |
-| **API errors** | Verify API key validity, check network connection |
-| **Analysis stuck** | Check network connection, try re-analyzing |
-| **No summary generated** | Wait for analysis to complete, check console for errors |
-| **Chat not working** | Ensure site indexing is complete, check API status |
 
-### 🐛 **Debug Mode**
 
-1. **Open Developer Tools**
-   - Press F12 or right-click → Inspect
-   - Go to Console tab
 
-2. **Look for Site Scout Logs**
-   - 🚀 Initialization logs
-   - 📊 Progress updates
-   - ✅ Success messages
-   - ❌ Error messages
-
-3. **Check Network Tab**
-   - Monitor API calls to nation.fun
-   - Verify request/response data
-
-## 📈 Roadmap
-
-### 🚀 **Version 1.1 (Coming Soon)**
-- [ ] **Multi-language Support** - English, Indonesian, and more
-- [ ] **Export Functionality** - PDF, Markdown, and text export
-- [ ] **Batch Analysis** - Analyze multiple tabs simultaneously
-- [ ] **Custom Templates** - User-defined analysis preferences
-
-### 🔮 **Version 1.2 (Future)**
-- [ ] **Offline Mode** - Cached analysis for offline access
-- [ ] **Browser Sync** - Cross-device session synchronization
-- [ ] **Advanced Filtering** - Content type-specific analysis
-- [ ] **Integration APIs** - Connect with note-taking and productivity apps
-
-### 🌟 **Long-term Vision**
-- [ ] **Voice Interaction** - Speech-to-text and text-to-speech
-- [ ] **Screenshot Analysis** - Visual content understanding
-- [ ] **Cross-page Context** - Multi-page analysis and connections
-- [ ] **Team Collaboration** - Shared analysis and team features
-
-## 🤝 Contributing
-
-We welcome contributions from the community! Here's how you can help:
-
-### 🎯 **Areas for Contribution**
-- **UI/UX Improvements**: Better user interface design and user experience
-- **Animation Enhancements**: More robot animations and visual effects
-- **AI Integration**: Additional AI services and capabilities
-- **Performance Optimization**: Better performance and efficiency
-- **Documentation**: Improved guides, tutorials, and documentation
-- **Testing**: Bug reports, feature testing, and quality assurance
-
-### 📝 **Contribution Process**
-
-1. **Fork** the repository
-2. **Create** a feature branch (`git checkout -b feature/amazing-feature`)
-3. **Make** your changes following the coding standards
-4. **Test** your changes thoroughly
-5. **Commit** your changes (`git commit -m 'Add amazing feature'`)
-6. **Push** to your branch (`git push origin feature/amazing-feature`)
-7. **Open** a Pull Request
-
-### 📋 **Development Guidelines**
-- Follow ES6+ JavaScript standards
-- Add console logging for debugging
-- Test on multiple websites and browsers
-- Update documentation for new features
-- Maintain consistent code style and formatting
 
 ## 📄 License
 
@@ -364,58 +254,28 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 - ✅ Patent use allowed
 - ✅ Only requires license and copyright notice
 
-## 📞 Support & Community
+## 📞 Contact Information
 
-### 📚 **Documentation**
-- **[User Guide](USER_GUIDE.md)** - Detailed user documentation
-- **[Project Description](PROJECT_DESCRIPTION.md)** - Technical project overview
-- **[Project Summary](PROJECT_SUMMARY.md)** - Implementation status
+- **Project Email**: coresolution3@gmail.com
+- **GitHub**: [@envexx](https://github.com/envexx)
+- **Website**: [https://site-scout.vercel.app/](https://site-scout.vercel.app/)
 
-### 🆘 **Getting Help**
-- **GitHub Issues**: [Report bugs or request features](https://github.com/yourusername/site-scout/issues)
-- **Documentation**: Check the user guide and project files
-- **Community**: Join our developer community discussions
 
-### 📧 **Contact Information**
-- **Project Email**: support@sitescout.dev
-- **GitHub**: [@yourusername](https://github.com/yourusername)
-- **Website**: [sitescout.dev](https://sitescout.dev)
-
-## 🌟 Why Choose Site Scout AI?
-
-**Site Scout AI** represents the future of web browsing - where **nation.fun** artificial intelligence enhances human understanding and productivity. By combining cutting-edge AI technology from nation.fun with beautiful, intuitive design, we've created a tool that transforms how people interact with web content.
-
-### 🎯 **Key Benefits**
-- **Enhanced Web Experience**: Transform passive browsing into interactive learning with nation.fun AI
-- **Productivity Boost**: Save time searching for specific information using nation.fun's intelligent analysis
-- **Learning Enhancement**: Understand complex content with nation.fun AI assistance
-- **Professional Tool**: Enterprise-grade AI integration from nation.fun with professional interface
-
-### 🏆 **What Makes Us Different**
-- **Intelligent Analysis**: nation.fun AI-powered content understanding, not just text extraction
-- **Beautiful Design**: Modern glassmorphism interface with smooth animations
-- **Privacy First**: Local processing when possible, secure API communication with nation.fun
-- **Open Source**: Transparent, community-driven development
-- **Powered by nation.fun**: Leveraging the latest AI technology from nation.fun
 
 ---
 
-## 🚀 Ready to Transform Your Web Experience?
+## 🚀 Get Started
 
-**Site Scout AI** is ready to revolutionize how you interact with the web. Whether you're a developer debugging complex applications, a researcher gathering information, or simply someone who wants to understand the web better, we provide the intelligent assistance you need through **nation.fun** AI technology.
-
-### 🎯 **Get Started Today**
 1. **[Download](https://drive.google.com/drive/folders/1rWhn8ccg27s1tRLSJnhXF5V6kJS8kGpu)** the extension
 2. **Configure** your nation.fun API key
-3. **Start** analyzing web pages with nation.fun AI
-4. **Experience** the future of web browsing
+3. **Start** analyzing web pages with AI
 
 ---
 
-**Built with ❤️ and 🤖 for the future of web interaction**
+**Built with ❤️ and 🤖 for Hackathon**
 
-*Site Scout AI - Where AI meets web browsing, powered by nation.fun* 🕷️✨
+*Site Scout AI - AI-powered web analysis extension* 🕷️✨
 
 ---
 
-*Last updated: January 2025 | Version: 1.0.0*
+*Hackathon Project | Version: 1.0.0*

@@ -1,42 +1,48 @@
 # 🕷️ Site Scout AI - Intelligent Web Analysis Extension
 
-> **AI-Powered Web Research Agent** - Transform your browsing experience with intelligent web page analysis, automated content indexing, and contextual AI chat capabilities.
+<div align="center">
+  <img src="icons/logo.png" alt="Site Scout AI Logo" width="200" height="200">
+  <br>
+  <em>AI-Powered Web Research Agent powered by nation.fun</em>
+</div>
 
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/yourusername/site-scout)
+> **AI-Powered Web Research Agent** - Transform your browsing experience with intelligent web page analysis, automated content indexing, and contextual AI chat capabilities. Powered by **nation.fun** AI technology.
+
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/envexx/site-scout)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Chrome Extension](https://img.shields.io/badge/Chrome-Extension-yellow.svg)](https://chrome.google.com/webstore)
 [![Manifest V3](https://img.shields.io/badge/Manifest-V3-orange.svg)](https://developer.chrome.com/docs/extensions/mv3/)
+[![Powered by](https://img.shields.io/badge/Powered%20by-nation.fun-purple.svg)](https://nation.fun)
 
 ## 🌟 What is Site Scout AI?
 
-**Site Scout AI** is a sophisticated Chrome browser extension that leverages artificial intelligence to revolutionize how you interact with web content. It automatically analyzes web pages, provides comprehensive summaries, and enables intelligent conversations about any webpage content through an advanced AI chat interface.
+**Site Scout AI** is a sophisticated Chrome browser extension that leverages **nation.fun** artificial intelligence to revolutionize how you interact with web content. It automatically analyzes web pages, provides comprehensive summaries, and enables intelligent conversations about any webpage content through an advanced AI chat interface powered by nation.fun's cutting-edge AI technology.
 
 ### ✨ Key Features
 
-- 🤖 **AI-Powered Analysis** - Automatic web page content understanding and indexing
-- 💬 **Interactive AI Chat** - Contextual conversations about webpage content
+- 🤖 **AI-Powered Analysis** - Automatic web page content understanding and indexing powered by nation.fun
+- 💬 **Interactive AI Chat** - Contextual conversations about webpage content using nation.fun AI
 - 🎨 **Modern Interface** - Beautiful glassmorphism design with smooth animations
-- 📊 **Smart Indexing** - Intelligent content processing and pattern recognition
-- 🔒 **Privacy First** - Local processing when possible, secure API communication
+- 📊 **Smart Indexing** - Intelligent content processing and pattern recognition via nation.fun
+- 🔒 **Privacy First** - Local processing when possible, secure API communication with nation.fun
 - 📱 **Responsive Design** - Works perfectly on all devices and screen sizes
 
 ## 🚀 Quick Start
 
-### 📥 Installation
+### 📥 Download & Installation
 
-1. **Clone the Repository**
-   ```bash
-   git clone https://github.com/yourusername/site-scout.git
-   cd site-scout
-   ```
+1. **Download the Extension**
+   - 📦 **[Download from Google Drive](https://drive.google.com/drive/folders/1rWhn8ccg27s1tRLSJnhXF5V6kJS8kGpu)**
+   - Extract the downloaded ZIP file to your desired location
 
 2. **Load Extension in Chrome**
    - Open `chrome://extensions/` in your browser
    - Enable "Developer mode" (toggle in top right)
-   - Click "Load unpacked" → select the project folder
+   - Click "Load unpacked" → select the extracted project folder
 
 3. **Configure API Key**
    - Click the Site Scout icon in your toolbar
+   - Go to Settings → Enter your nation.fun API key
    - Api Key : sk-bb1b4da1bdb4c57fdfb39c60d9a99a0b6dfa81cca40895175b5da9bc63c12c58
    - Test the connection to verify setup
 
@@ -45,7 +51,7 @@
 1. **Navigate** to any web page you want to analyze
 2. **Click** the Site Scout AI icon in your browser toolbar
 3. **Wait** for automatic analysis to complete (typically 10-60 seconds)
-4. **Read** the comprehensive AI-generated summary
+4. **Read** the comprehensive AI-generated summary powered by nation.fun
 5. **Ask** follow-up questions about the content through the chat interface
 
 ## 🏗️ Project Architecture
@@ -56,13 +62,22 @@
 site-scout/
 ├── 📄 manifest.json                    # Chrome extension configuration (MV3)
 ├── 📁 icons/                           # Extension icons (16x16, 48x48, 128x128)
+│   ├── logo.png                        # Main extension logo
+│   ├── icon16.png                      # 16x16 extension icon
+│   ├── icon48.png                      # 48x48 extension icon
+│   └── icon128.png                     # 128x128 extension icon
 ├── 📁 src/                             # Source code
 │   ├── 📁 popup/                       # Main extension popup interface
 │   │   ├── popup.html                  # Popup HTML structure
-│   │   ├── popup.css                   # Modern styling with animations
 │   │   ├── popup.js                    # Main popup logic & UI interactions
+│   │   ├── style.css                   # Popup styling
+│   │   ├── analysis-loading.html       # Analysis loading interface
+│   │   ├── analysis-loading-controller.js # Loading controller logic
+│   │   ├── robot-loading.html          # Robot animation interface
 │   │   ├── robot-loader.js             # Robot loading animation controller
-│   │   └── robot-loading.html          # Robot animation interface
+│   │   ├── animation-controller.js     # Animation management
+│   │   ├── animate.html                # Animation testing interface
+│   │   └── test-robot-loader.html      # Robot loader testing
 │   ├── 📁 settings/                    # Configuration and settings panel
 │   │   ├── settings.html               # Settings page structure
 │   │   ├── settings.css                # Settings styling
@@ -70,44 +85,54 @@ site-scout/
 │   ├── 📁 background/                  # Service worker (MV3)
 │   │   └── background.js               # Background tasks & API management
 │   └── 📁 lib/                         # Core libraries and utilities
-│       ├── api_handler.js              # IntentKit API integration
+│       ├── api_handler.js              # nation.fun API integration
 │       └── storage_manager.js          # Chrome storage wrapper
 ├── 📁 landing-page/                    # Project landing page
 │   ├── index.html                      # Main landing page
-│   └── picture/                        # Landing page images
+│   └── 📁 picture/                     # Landing page images
+│       ├── logo.png                    # Landing page logo
+│       ├── nation.png                  # nation.fun branding
+│       ├── analyzing.png               # Analysis feature preview
+│       ├── chat.png                    # Chat feature preview
+│       ├── Features.png                # Features preview
+│       └── Setup.png                   # Setup configuration preview
+├── 📁 animation/                       # Animation testing and development
+│   └── index.html                      # Animation test interface
 ├── 📄 README.md                        # This file
-├── 📄 PROJECT_DESCRIPTION.md           # Detailed project overview
-├── 📄 PROJECT_SUMMARY.md               # Implementation status
-└── 📄 USER_GUIDE.md                    # User documentation
+├── 📄 package.json                     # Node.js dependencies
+├── 📄 package-lock.json                # Locked dependency versions
+├── 📄 test_api.js                      # API testing utilities
+└── 📄 site-scout-nation.zip            # Distribution package
 ```
 
 ### 🔧 Technical Stack
 
 - **Frontend**: HTML5, CSS3, JavaScript (ES6+)
 - **Extension**: Chrome Extension Manifest V3
-- **AI Integration**: IntentKit Agent API
+- **AI Integration**: **nation.fun** AI Agent API
 - **Storage**: Chrome Storage API
 - **Design**: Modern CSS with glassmorphism effects
 - **Animations**: Hardware-accelerated CSS animations
+- **Package Management**: Node.js with npm
 
 ## 🎯 Core Features
 
-### 🤖 **AI-Powered Web Analysis**
+### 🤖 **AI-Powered Web Analysis (Powered by nation.fun)**
 
 | Feature | Description |
 |---------|-------------|
-| **Intelligent Content Understanding** | Automatically analyzes web page content, structure, and context using advanced NLP |
-| **Smart Indexing** | Processes and indexes web pages for AI comprehension, identifying key information |
-| **Pattern Recognition** | Detects navigation elements, content hierarchy, and important sections |
-| **Real-time Processing** | Live analysis with progress tracking and status updates |
+| **Intelligent Content Understanding** | Automatically analyzes web page content, structure, and context using nation.fun's advanced NLP |
+| **Smart Indexing** | Processes and indexes web pages for AI comprehension, identifying key information via nation.fun |
+| **Pattern Recognition** | Detects navigation elements, content hierarchy, and important sections using nation.fun AI |
+| **Real-time Processing** | Live analysis with progress tracking and status updates powered by nation.fun |
 
-### 💬 **Interactive AI Chat Interface**
+### 💬 **Interactive AI Chat Interface (nation.fun AI)**
 
 | Feature | Description |
 |---------|-------------|
-| **Contextual Conversations** | Chat with AI about the current webpage content |
-| **Real-time Responses** | Get instant answers and insights about page elements |
-| **Smart Suggestions** | AI provides relevant questions and analysis prompts |
+| **Contextual Conversations** | Chat with nation.fun AI about the current webpage content |
+| **Real-time Responses** | Get instant answers and insights about page elements from nation.fun |
+| **Smart Suggestions** | nation.fun AI provides relevant questions and analysis prompts |
 | **Chat History** | Persistent conversation history per website |
 
 ### 🎨 **Modern User Interface**
@@ -130,21 +155,21 @@ site-scout/
 
 ## 🔄 How It Works
 
-### 1. **Content Analysis Flow**
+### 1. **Content Analysis Flow (nation.fun Integration)**
 ```
-User Opens Extension → AI Agent Initializes → Content Crawling → Analysis Processing → Summary Generation → Chat Ready
+User Opens Extension → nation.fun AI Agent Initializes → Content Crawling → Analysis Processing → Summary Generation → Chat Ready
 ```
 
 ### 2. **Analysis Stages**
-1. **🔄 Initialize (15%)** - Setup AI agent connection and prepare analysis
+1. **🔄 Initialize (15%)** - Setup nation.fun AI agent connection and prepare analysis
 2. **🕷️ Crawling (40%)** - Extract and process page content
-3. **🧠 Processing (80%)** - AI analysis and content structuring
+3. **🧠 Processing (80%)** - nation.fun AI analysis and content structuring
 4. **✅ Finalizing (95%)** - Format summary and prepare chat interface
 5. **🎉 Complete (100%)** - Display results and enable interactions
 
-### 3. **Chat Interaction Flow**
+### 3. **Chat Interaction Flow (nation.fun AI)**
 ```
-User Question → Context Analysis → AI Processing → Response Generation → Display Answer → Save to History
+User Question → Context Analysis → nation.fun AI Processing → Response Generation → Display Answer → Save to History
 ```
 
 ## 🎯 Use Cases
@@ -178,25 +203,29 @@ User Question → Context Analysis → AI Processing → Response Generation →
 ### 🚀 Setup Development Environment
 
 ```bash
-# Clone repository
-git clone https://github.com/yourusername/site-scout.git
-cd site-scout
+# Download from Google Drive
+# 1. Visit: https://drive.google.com/drive/folders/1rWhn8ccg27s1tRLSJnhXF5V6kJS8kGpu
+# 2. Download site-scout-nation.zip
+# 3. Extract to your desired location
+
+# Install dependencies (if developing)
+npm install
 
 # Load extension in Chrome
 # 1. Open chrome://extensions/
 # 2. Enable "Developer mode"
-# 3. Click "Load unpacked" → select 'site-scout' folder
+# 3. Click "Load unpacked" → select extracted 'site-scout' folder
 ```
 
 ### 🔑 API Configuration
 
-1. **Get IntentKit API Key**
-   - Visit [IntentKit Service](https://open.service.crestal.network/)
+1. **Get nation.fun API Key**
+   - Visit [nation.fun](https://nation.fun)
    - Sign up and generate your API key
 
 2. **Configure Extension**
    - Open Site Scout settings
-   - Enter your API key
+   - Enter your nation.fun API key
    - Test connection to verify setup
 
 ### 🧪 Testing
@@ -272,7 +301,7 @@ cd site-scout
    - ❌ Error messages
 
 3. **Check Network Tab**
-   - Monitor API calls to IntentKit
+   - Monitor API calls to nation.fun
    - Verify request/response data
 
 ## 📈 Roadmap
@@ -354,37 +383,38 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 ## 🌟 Why Choose Site Scout AI?
 
-**Site Scout AI** represents the future of web browsing - where artificial intelligence enhances human understanding and productivity. By combining cutting-edge AI technology with beautiful, intuitive design, we've created a tool that transforms how people interact with web content.
+**Site Scout AI** represents the future of web browsing - where **nation.fun** artificial intelligence enhances human understanding and productivity. By combining cutting-edge AI technology from nation.fun with beautiful, intuitive design, we've created a tool that transforms how people interact with web content.
 
 ### 🎯 **Key Benefits**
-- **Enhanced Web Experience**: Transform passive browsing into interactive learning
-- **Productivity Boost**: Save time searching for specific information
-- **Learning Enhancement**: Understand complex content with AI assistance
-- **Professional Tool**: Enterprise-grade AI integration with professional interface
+- **Enhanced Web Experience**: Transform passive browsing into interactive learning with nation.fun AI
+- **Productivity Boost**: Save time searching for specific information using nation.fun's intelligent analysis
+- **Learning Enhancement**: Understand complex content with nation.fun AI assistance
+- **Professional Tool**: Enterprise-grade AI integration from nation.fun with professional interface
 
 ### 🏆 **What Makes Us Different**
-- **Intelligent Analysis**: AI-powered content understanding, not just text extraction
+- **Intelligent Analysis**: nation.fun AI-powered content understanding, not just text extraction
 - **Beautiful Design**: Modern glassmorphism interface with smooth animations
-- **Privacy First**: Local processing when possible, secure API communication
+- **Privacy First**: Local processing when possible, secure API communication with nation.fun
 - **Open Source**: Transparent, community-driven development
+- **Powered by nation.fun**: Leveraging the latest AI technology from nation.fun
 
 ---
 
 ## 🚀 Ready to Transform Your Web Experience?
 
-**Site Scout AI** is ready to revolutionize how you interact with the web. Whether you're a developer debugging complex applications, a researcher gathering information, or simply someone who wants to understand the web better, we provide the intelligent assistance you need.
+**Site Scout AI** is ready to revolutionize how you interact with the web. Whether you're a developer debugging complex applications, a researcher gathering information, or simply someone who wants to understand the web better, we provide the intelligent assistance you need through **nation.fun** AI technology.
 
 ### 🎯 **Get Started Today**
-1. **Install** the extension
-2. **Configure** your API key
-3. **Start** analyzing web pages
+1. **[Download](https://drive.google.com/drive/folders/1rWhn8ccg27s1tRLSJnhXF5V6kJS8kGpu)** the extension
+2. **Configure** your nation.fun API key
+3. **Start** analyzing web pages with nation.fun AI
 4. **Experience** the future of web browsing
 
 ---
 
 **Built with ❤️ and 🤖 for the future of web interaction**
 
-*Site Scout AI - Where AI meets web browsing* 🕷️✨
+*Site Scout AI - Where AI meets web browsing, powered by nation.fun* 🕷️✨
 
 ---
 

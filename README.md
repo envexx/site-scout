@@ -13,6 +13,7 @@
 [![Chrome Extension](https://img.shields.io/badge/Chrome-Extension-yellow.svg)](https://chrome.google.com/webstore)
 [![Manifest V3](https://img.shields.io/badge/Manifest-V3-orange.svg)](https://developer.chrome.com/docs/extensions/mv3/)
 [![Powered by](https://img.shields.io/badge/Powered%20by-nation.fun-purple.svg)](https://nation.fun)
+[![Demo & Tutorial Video](https://img.shields.io/badge/Demo%20Video-YouTube-red)](https://youtu.be/vOsI0_nHO4A?si=eIwKEBugoziQELqg)
 
 ## 🌟 What is Site Scout AI?
 
@@ -28,6 +29,8 @@
 - 📱 **Responsive Design** - Works perfectly on all devices and screen sizes
 
 ## 🚀 Quick Start
+
+**🎥 [Watch Demo & Tutorial Video](https://youtu.be/vOsI0_nHO4A?si=eIwKEBugoziQELqg)**
 
 ### 📥 Download & Installation
 

@@ -43,9 +43,8 @@
    - Enable "Developer mode" (toggle in top right)
    - Click "Load unpacked" → select the extracted project folder
 
-3. **API Key Sudah Otomatis**
-   - Tidak perlu lagi memasukkan atau mengatur API key secara manual.
-   - Site Scout AI sudah langsung siap digunakan dengan API key yang tertanam.
+3. **API Key is Automatic**
+   - No more need to enter or set API keys manually.
 
 ### 🎯 First Use
 
@@ -268,8 +267,7 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 ## 🚀 Get Started
 
 1. **[Download](https://drive.google.com/drive/folders/1rWhn8ccg27s1tRLSJnhXF5V6kJS8kGpu)** the extension
-2. **Tidak perlu konfigurasi API key**
-3. **Langsung mulai** menganalisis halaman web dengan AI
+2. **Get started straight away** analyzing web pages with AI
 
 ---
 

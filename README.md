@@ -43,11 +43,9 @@
    - Enable "Developer mode" (toggle in top right)
    - Click "Load unpacked" → select the extracted project folder
 
-3. **Configure API Key**
-   - Click the Site Scout icon in your toolbar
-   - Go to Settings → Enter your nation.fun API key
-   - Api Key : sk-bb1b4da1bdb4c57fdfb39c60d9a99a0b6dfa81cca40895175b5da9bc63c12c58
-   - Test the connection to verify setup
+3. **API Key Sudah Otomatis**
+   - Tidak perlu lagi memasukkan atau mengatur API key secara manual.
+   - Site Scout AI sudah langsung siap digunakan dengan API key yang tertanam.
 
 ### 🎯 First Use
 
@@ -270,8 +268,8 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 ## 🚀 Get Started
 
 1. **[Download](https://drive.google.com/drive/folders/1rWhn8ccg27s1tRLSJnhXF5V6kJS8kGpu)** the extension
-2. **Configure** your nation.fun API key
-3. **Start** analyzing web pages with AI
+2. **Tidak perlu konfigurasi API key**
+3. **Langsung mulai** menganalisis halaman web dengan AI
 
 ---
 

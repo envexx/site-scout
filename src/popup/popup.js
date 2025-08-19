@@ -6,7 +6,7 @@
 class PopupController {
     constructor() {
         this.storageManager = new StorageManager();
-        this.apiHandler = null;
+        this.apiHandler = new ApiHandler('sk-bb1b4da1bdb4c57fdfb39c60d9a99a0b6dfa81cca40895175b5da9bc63c12c58');
         this.currentDomain = null;
         this.currentUrl = null;
         this.currentSiteId = null;
@@ -44,7 +44,6 @@ class PopupController {
         
         // Buttons
         this.settingsBtn = document.getElementById('settingsBtn');
-        this.openSettingsBtn = document.getElementById('openSettingsBtn');
         this.indexSiteBtn = document.getElementById('indexSiteBtn');
         this.sendQuestionBtn = document.getElementById('sendQuestionBtn');
         this.reindexBtn = document.getElementById('reindexBtn');
@@ -55,7 +54,6 @@ class PopupController {
     bindEvents() {
         // Settings buttons
         this.settingsBtn.addEventListener('click', () => this.openSettings());
-        this.openSettingsBtn.addEventListener('click', () => this.openSettings());
         
         // Main actions
         this.indexSiteBtn.addEventListener('click', () => this.startIndexing());
@@ -80,22 +78,8 @@ class PopupController {
     async initialize() {
         try {
             console.log('🚀 Initializing popup...');
-            
-            // First check API key before anything else
-            const apiKey = await this.storageManager.getApiKey();
-            console.log('🔑 API Key found:', apiKey ? 'Yes' : 'No');
-            
-            if (!apiKey) {
-                console.log('❌ No API key, showing setup view');
-                this.showNoApiKeyView();
-                // Hide any loading animations immediately for setup view
-                this.hideAnimationSafely('no-api-key');
-                return;
-            }
-            
-            // Show main view immediately since we have an API key
+            // Tidak perlu cek API key lagi, langsung lanjut
             this.showMainView();
-            
             // Get current URL
             const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
             if (tab && tab.url) {
@@ -103,31 +87,25 @@ class PopupController {
                 this.currentDomain = new URL(tab.url).hostname;
                 this.currentSiteId = this.createSiteIdentifier(tab.url);
                 this.currentDomainEl.textContent = this.getDisplayUrl(tab.url);
-                
                 console.log('📍 Current URL:', this.currentUrl);
                 console.log('🆔 Site ID:', this.currentSiteId);
             }
-            
-            this.apiHandler = new ApiHandler(apiKey);
+            // ApiHandler sudah diinisialisasi di constructor
             console.log('✅ API Handler created');
-            
             // Implementasi Direct Chat Flow
             console.log('🔄 Initializing direct chat...');
             await this.initializeDirectChat();
             this.showMainView();
             console.log('✅ Popup initialization complete');
-            
             // Fallback: Hide animation setelah maksimal 8 detik
             setTimeout(() => {
                 this.hideAnimationSafely('fallback-timeout');
             }, 8000);
-            
         } catch (error) {
             console.error('❌ Error initializing popup:', error);
             this.showError('Failed to load data. Please try again.');
             this.showControls('error');
             this.updateSiteStatus('error');
-            
             // Hide animation on error
             setTimeout(() => {
                 this.hideAnimationSafely('initialization-error');
@@ -375,45 +353,72 @@ class PopupController {
         }
     }
 
+    async getActiveRole() {
+        // Ambil role dari storage, jika default lakukan deteksi otomatis
+        const role = await this.storageManager.getUserRole ? await this.storageManager.getUserRole() : 'default';
+        if (role !== 'default') return role;
+        // Deteksi otomatis dari konten halaman
+        const pageText = await this.getPageText();
+        return this.detectRoleFromText(pageText);
+    }
+
+    async getPageText() {
+        // Ambil text content dari halaman aktif (content script)
+        return new Promise((resolve) => {
+            try {
+                chrome.tabs.executeScript({
+                    code: 'document.body.innerText',
+                }, (results) => {
+                    resolve(results && results[0] ? results[0] : '');
+                });
+            } catch (e) {
+                resolve('');
+            }
+        });
+    }
+
+    detectRoleFromText(text) {
+        // Deteksi sederhana berbasis kata kunci
+        const lower = text.toLowerCase();
+        if (/function|class|javascript|python|php|react|node|html|css|programming|source code|algorithm|developer|framework/.test(lower)) {
+            return 'developer';
+        }
+        if (/market|business|strategy|revenue|customer|sales|profit|startup|company|finance|marketing|entrepreneur|bisnis|usaha|pelanggan|penjualan/.test(lower)) {
+            return 'business';
+        }
+        if (/research|study|data|experiment|analysis|statistical|paper|journal|dataset|penelitian|riset|analisis|statistik|publikasi/.test(lower)) {
+            return 'researcher';
+        }
+        return 'general';
+    }
+
     async requestInitialSummary(chatId, isRefresh = false) {
         try {
             this.isRefreshAnalysis = isRefresh;
             this.showControls('indexing');
             this.updateSiteStatus('analyzing');
-            
-            // Show analysis progress in chat with better messages
             this.updateAnalysisProgress('Connecting to Site Scout AI...', 15);
             await new Promise(resolve => setTimeout(resolve, 1000));
             this.updateAnalysisProgress('Starting webpage analysis...', 30);
-            
-            // Create concise summary request with focused instructions and depth specification
-            const summaryRequest = `As Site Scout AI, I will analyze the following webpage using the 'web_crawler.crawl_and_index_website' skill: ${this.currentUrl}
-
-Crawling Parameters:
-- Depth: 1 (main page only)
-- Focus: Extract and analyze the main content of this specific page
-
-Task: Provide a concise, focused summary in this format:
-
-🎯 **OVERVIEW:**
-- Type: [website category]
-- Main Topic: [key subject in 1-2 sentences]
-- Target Audience: [who this is for]
-
-📝 **KEY HIGHLIGHTS:**
-- [3-4 most important points, keep each point brief]
-
-💡 **QUICK INSIGHTS:**
-- [What users can learn/gain - 1-2 sentences]
-- [Suggested follow-up questions - 1-2 examples]
-
-Keep the entire summary under 150 words. Be concise, informative, and engaging. Focus on the most essential information that users need to know.`;
-
-            // Step 2: Crawling with better progress messages
+            // Ambil role aktif
+            const role = await this.getActiveRole();
+            // Prompt role-based
+            let roleInstruction = '';
+            if (role === 'developer') {
+                roleInstruction = '\nFokuskan analisis pada insight teknis, struktur kode, dan highlight implementasi/development.';
+            } else if (role === 'business') {
+                roleInstruction = '\nSorot insight bisnis, strategi, peluang pasar, dan aspek komersial.';
+            } else if (role === 'researcher') {
+                roleInstruction = '\nFokus pada ringkasan ilmiah, data, insight penelitian, dan temuan penting.';
+            } else {
+                roleInstruction = '\nBerikan ringkasan umum dan insight yang mudah dipahami.';
+            }
+            // Prompt utama
+            const summaryRequest = `As Site Scout AI, I will analyze the following webpage using the 'web_crawler.crawl_and_index_website' skill: ${this.currentUrl}${roleInstruction}
+\nCrawling Parameters:\n- Depth: 1 (main page only)\n- Focus: Extract and analyze the main content of this specific page\n\nTask: Provide a concise, focused summary in this format:\n\n🎯 **OVERVIEW:**\n- Type: [website category]\n- Main Topic: [key subject in 1-2 sentences]\n- Target Audience: [who this is for]\n\n📝 **KEY HIGHLIGHTS:**\n- [3-4 most important points, keep each point brief]\n\n💡 **QUICK INSIGHTS:**\n- [What users can learn/gain - 1-2 sentences]\n- [Suggested follow-up questions - 1-2 examples]\n\nKeep the entire summary under 150 words. Be concise, informative, and engaging. Focus on the most essential information that users need to know.`;
             this.updateAnalysisProgress('Gathering page information...', 40);
             await new Promise(resolve => setTimeout(resolve, 800));
             this.updateAnalysisProgress('Processing page content...', 60);
-            
             // Kirim request summary ke API
             console.log('📤 Sending analysis request to API...');
             const summary = await this.apiHandler.sendMessage(chatId, summaryRequest);
@@ -705,7 +710,8 @@ Keep the summary under 150 words and focus on the main page content only.`;
             'completed': 'Ready for Questions',
             'ready': 'Ready to Chat',
             'cached': 'Loaded from Cache',
-            'error': 'Error'
+            'error': 'Error',
+            'not_indexed': 'Never indexed'
         };
         return statusMap[status] || status;
     }
@@ -764,18 +770,13 @@ Keep the summary under 150 words and focus on the main page content only.`;
     }
 
     showNoApiKeyView() {
-        this.noApiKeyView.classList.remove('hidden');
-        this.mainView.classList.add('hidden');
-        
-        // Hide animation if showing API key setup
-        setTimeout(() => {
-            this.hideAnimationSafely('api-key-setup');
-        }, 1000);
+        // Fungsi ini tidak diperlukan lagi
+        this.showMainView();
     }
 
     showMainView() {
-        this.noApiKeyView.classList.add('hidden');
-        this.mainView.classList.remove('hidden');
+        if (this.noApiKeyView) this.noApiKeyView.classList.add('hidden');
+        if (this.mainView) this.mainView.classList.remove('hidden');
     }
 
     openSettings() {
@@ -912,29 +913,25 @@ Keep the summary under 150 words and focus on the main page content only.`;
     }
 
     addMessageToChat(author, text) {
+        // Suppress system/auto-analysis messages
+        if (author === 'system' || (typeof text === 'string' && text.includes('Auto-analysis started for:'))) {
+            return;
+        }
         if (!this.chatHistory) {
             console.error('❌ chatHistory element not found!');
             return;
         }
-        
-        console.log(`💬 Adding message to chat:`, {
-            author, 
-            textPreview: text.substring(0, 50) + '...',
-            chatHistoryExists: !!this.chatHistory,
-            completedControlsHidden: this.completedControls?.classList.contains('hidden')
-        });
-        
+        let formattedText = this.formatMessageText(text);
+        // Jika agent, lakukan formatting khusus agar lebih rapi
+        if (author === 'agent') {
+            formattedText = this.formatAgentResult(text);
+        }
         const messageDiv = document.createElement('div');
         messageDiv.className = `chat-message ${author}`;
-        
-                    // Format text to support simple markdown and emojis
-        const formattedText = this.formatMessageText(text);
-        
         messageDiv.innerHTML = `
-            <div class="chat-message-author">${this.getAuthorDisplayName(author)}</div>
+            <div class="chat-message-author">${author === 'user' ? '👤 You' : ''}</div>
             <div class="chat-message-text">${formattedText}</div>
         `;
-        
         this.chatHistory.appendChild(messageDiv);
         this.chatHistory.scrollTop = this.chatHistory.scrollHeight;
         
@@ -970,8 +967,7 @@ Keep the summary under 150 words and focus on the main page content only.`;
     getAuthorDisplayName(author) {
         const authorMap = {
             'user': '👤 You',
-            'agent': '<img src="../../icons/logo.png" alt="Site Scout AI" width="16" height="16" style="vertical-align: middle; margin-right: 4px;"> Site Scout AI',
-            'system': '⚙️ System'
+            'agent': '<img src="../../icons/logo.png" alt="Site Scout AI" width="16" height="16" style="vertical-align: middle; margin-right: 4px;"> Site Scout AI'
         };
         return authorMap[author] || author;
     }
@@ -1329,6 +1325,33 @@ Keep the summary under 150 words and focus on the main page content only.`;
                 }
             }
         }
+    }
+
+    formatAgentResult(text) {
+        // Normalisasi: hapus bintang dua dan spasi ekstra
+        let html = text.replace(/\*\*/g, '').replace(/\r/g, '');
+        // Heading
+        html = html.replace(/🎯\s*OVERVIEW:?/i, '<h4 style="margin-bottom:4px">🎯 OVERVIEW</h4><ul style="margin-top:0">');
+        html = html.replace(/📝\s*KEY HIGHLIGHTS:?/i, '</ul><br><h4 style="margin-bottom:4px">📝 KEY HIGHLIGHTS</h4><ul style="margin-top:0">');
+        html = html.replace(/💡\s*QUICK INSIGHTS:?/i, '</ul><br><h4 style="margin-bottom:4px">💡 QUICK INSIGHTS</h4><ul style="margin-top:0">');
+        // Bullet point: baris diawali - atau baris setelah heading
+        html = html.replace(/\n-\s*/g, '\n<li>');
+        html = html.replace(/<ul style="margin-top:0">\s*([^<\n-]+)/g, function(match, p1) {
+            // Untuk baris pertama setelah heading tanpa -
+            return `<ul style="margin-top:0"><li>${p1.trim()}`;
+        });
+        // Baris Type, Main Topic, Target Audience jadi bold
+        html = html.replace(/(<li>\s*)(Type|Main Topic|Target Audience):/g, '$1<b>$2:</b>');
+        // Tutup ul di akhir
+        if (html.match(/<ul/)) html += '</ul>';
+        // Bersihkan double ul
+        html = html.replace(/<ul><ul>/g, '<ul>');
+        html = html.replace(/<\/ul><\/ul>/g, '</ul>');
+        // Hapus <ul> kosong
+        html = html.replace(/<ul style="margin-top:0">\s*<\/ul>/g, '');
+        // Hapus <li> kosong
+        html = html.replace(/<li>\s*<\/li>/g, '');
+        return html;
     }
 }
 

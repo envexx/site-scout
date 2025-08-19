@@ -17,37 +17,24 @@
         </header>
 
         <main class="main-content">
-            <!-- API Key Section -->
+            <!-- Role Selection Section -->
             <section class="settings-section">
-                <h2>🔑 API Key</h2>
-                <p class="section-description">
-                    Enter your IntentKit API key to use AI services.
-                    Your API key will be stored locally and never shared.
-                </p>
-                
+                <h2>🧑‍💼 User Role</h2>
+                <p class="section-description">Select your main role so the AI can tailor answers and analysis to your needs. If you choose Default (Automatic), the system will detect automatically based on the web content.</p>
                 <div class="form-group">
-                    <label for="apiKeyInput">API Key</label>
-                    <div class="input-with-button">
-                        <input 
-                            type="password" 
-                            id="apiKeyInput" 
-                            placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-                            autocomplete="off"
-                        >
-                        <button type="button" id="toggleApiKeyBtn" class="toggle-btn" title="Show/Hide">👁️</button>
-                    </div>
-                    <small class="help-text">
-                        Get your API key at <a href="https://open.service.crestal.network" target="_blank">open.service.crestal.network</a>
-                    </small>
+                    <label for="roleSelect">Role</label>
+                    <select id="roleSelect">
+                        <option value="default">Default (Automatic)</option>
+                        <option value="developer">Developer</option>
+                        <option value="researcher">Researcher</option>
+                        <option value="business">Business</option>
+                        <option value="general">General</option>
+                    </select>
                 </div>
-
-                <div class="form-actions">
-                    <button id="saveApiKeyBtn" class="primary-btn">💾 Save API Key</button>
-                    <button id="testApiKeyBtn" class="secondary-btn" disabled>🧪 Test Connection</button>
-                </div>
-
-                <div id="apiKeyStatus" class="status-message hidden"></div>
             </section>
+
+            <!-- API Key Section -->
+            <!-- Bagian API Key dihapus, user tidak perlu input API key lagi -->
 
             <!-- Situs Terindeks Section -->
             <section class="settings-section">

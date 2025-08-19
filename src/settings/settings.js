@@ -6,37 +6,29 @@
 class SettingsController {
     constructor() {
         this.storageManager = new StorageManager();
-        this.apiHandler = null;
-        
+        this.apiHandler = new ApiHandler('sk-bb1b4da1bdb4c57fdfb39c60d9a99a0b6dfa81cca40895175b5da9bc63c12c58');
+        // Inisialisasi elemen selain API key
         this.initializeElements();
         this.bindEvents();
         this.initialize();
     }
 
     initializeElements() {
-        // API Key elements
-        this.apiKeyInput = document.getElementById('apiKeyInput');
-        this.toggleApiKeyBtn = document.getElementById('toggleApiKeyBtn');
-        this.saveApiKeyBtn = document.getElementById('saveApiKeyBtn');
-        this.testApiKeyBtn = document.getElementById('testApiKeyBtn');
-        this.apiKeyStatus = document.getElementById('apiKeyStatus');
-        
+        // Role selection
+        this.roleSelect = document.getElementById('roleSelect');
         // Sites elements
         this.sitesList = document.getElementById('sitesList');
         this.refreshSitesBtn = document.getElementById('refreshSitesBtn');
         this.clearAllSitesBtn = document.getElementById('clearAllSitesBtn');
-        
         // Stats elements
         this.totalSites = document.getElementById('totalSites');
         this.totalMessages = document.getElementById('totalMessages');
         this.activeSites = document.getElementById('activeSites');
-        
         // About elements
         this.exportDataBtn = document.getElementById('exportDataBtn');
         this.importDataBtn = document.getElementById('importDataBtn');
         this.resetAllBtn = document.getElementById('resetAllBtn');
         this.fileInput = document.getElementById('fileInput');
-        
         // UI elements
         this.loadingOverlay = document.getElementById('loadingOverlay');
         this.notification = document.getElementById('notification');
@@ -45,36 +37,23 @@ class SettingsController {
     }
 
     bindEvents() {
-        // API Key events
-        this.toggleApiKeyBtn.addEventListener('click', () => this.toggleApiKeyVisibility());
-        this.saveApiKeyBtn.addEventListener('click', () => this.saveApiKey());
-        this.testApiKeyBtn.addEventListener('click', () => this.testApiKey());
-        this.apiKeyInput.addEventListener('input', () => this.onApiKeyInput());
-        
+        // Role selection event
+        this.roleSelect.addEventListener('change', () => this.saveUserRole());
         // Sites events
         this.refreshSitesBtn.addEventListener('click', () => this.loadSites());
         this.clearAllSitesBtn.addEventListener('click', () => this.clearAllSites());
-        
         // About events
         this.exportDataBtn.addEventListener('click', () => this.exportData());
         this.importDataBtn.addEventListener('click', () => this.fileInput.click());
         this.resetAllBtn.addEventListener('click', () => this.resetAll());
         this.fileInput.addEventListener('change', () => this.importData());
-        
         // Notification events
         this.closeNotificationBtn.addEventListener('click', () => this.hideNotification());
-        
-        // Keyboard events
-        this.apiKeyInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                this.saveApiKey();
-            }
-        });
     }
 
     async initialize() {
         try {
-            await this.loadApiKey();
+            await this.loadUserRole();
             await this.loadSites();
             await this.updateStats();
         } catch (error) {
@@ -83,90 +62,15 @@ class SettingsController {
         }
     }
 
-    async loadApiKey() {
-        const apiKey = await this.storageManager.getApiKey();
-        if (apiKey) {
-            this.apiKeyInput.value = apiKey;
-            this.testApiKeyBtn.disabled = false;
-            this.apiHandler = new ApiHandler(apiKey);
-            this.showApiKeyStatus('API Key tersimpan', 'success');
-        }
+    async loadUserRole() {
+        const role = await this.storageManager.getUserRole();
+        this.roleSelect.value = role || 'default';
     }
 
-    onApiKeyInput() {
-        const apiKey = this.apiKeyInput.value.trim();
-        this.testApiKeyBtn.disabled = !apiKey;
-        
-        if (!apiKey) {
-            this.hideApiKeyStatus();
-        }
-    }
-
-    toggleApiKeyVisibility() {
-        const isPassword = this.apiKeyInput.type === 'password';
-        this.apiKeyInput.type = isPassword ? 'text' : 'password';
-        this.toggleApiKeyBtn.textContent = isPassword ? '🙈' : '👁️';
-    }
-
-    async saveApiKey() {
-        const apiKey = this.apiKeyInput.value.trim();
-        
-        if (!apiKey) {
-            this.showApiKeyStatus('API Key tidak boleh kosong', 'error');
-            return;
-        }
-
-        if (!apiKey.startsWith('sk-')) {
-            this.showApiKeyStatus('Invalid API Key format (must start with sk-)', 'error');
-            return;
-        }
-
-        try {
-            this.showLoading();
-            
-            const success = await this.storageManager.saveApiKey(apiKey);
-            if (success) {
-                this.apiHandler = new ApiHandler(apiKey);
-                this.testApiKeyBtn.disabled = false;
-                this.showApiKeyStatus('API Key saved successfully', 'success');
-                this.showNotification('API Key saved successfully', 'success');
-            } else {
-                this.showApiKeyStatus('Failed to save API Key', 'error');
-            }
-        } catch (error) {
-            console.error('Error saving API key:', error);
-            this.showApiKeyStatus('Error occurred while saving', 'error');
-        } finally {
-            this.hideLoading();
-        }
-    }
-
-    async testApiKey() {
-        if (!this.apiHandler) {
-            this.showApiKeyStatus('Simpan API Key terlebih dahulu', 'error');
-            return;
-        }
-
-        try {
-            this.showLoading();
-            this.showApiKeyStatus('Menguji koneksi...', 'info');
-            
-            const isValid = await this.apiHandler.validateApiKey();
-            
-            if (isValid) {
-                this.showApiKeyStatus('✅ API Key valid and connected', 'success');
-                this.showNotification('API Key validated successfully', 'success');
-            } else {
-                this.showApiKeyStatus('❌ API Key invalid or cannot connect', 'error');
-                this.showNotification('API Key invalid', 'error');
-            }
-        } catch (error) {
-            console.error('Error testing API key:', error);
-            this.showApiKeyStatus('❌ Failed to test connection', 'error');
-            this.showNotification('Failed to test API Key', 'error');
-        } finally {
-            this.hideLoading();
-        }
+    async saveUserRole() {
+        const role = this.roleSelect.value;
+        await this.storageManager.saveUserRole(role);
+        this.showNotification('Role saved successfully', 'success');
     }
 
     async loadSites() {
@@ -185,8 +89,8 @@ class SettingsController {
         if (siteEntries.length === 0) {
             this.sitesList.innerHTML = `
                 <div class="empty-sites">
-                    <h3>🌐 Belum Ada Situs</h3>
-                    <p>Situs yang diindeks akan muncul di sini</p>
+                    <h3>🌐 No Indexed Sites Yet</h3>
+                    <p>Sites that are indexed will appear here</p>
                 </div>
             `;
             return;
@@ -200,18 +104,18 @@ class SettingsController {
                         <div class="site-domain">${displayUrl}</div>
                         <div class="site-meta">
                             ${data.last_indexed_at ? 
-                                `Terakhir diindeks: ${this.formatDate(data.last_indexed_at)}` : 
-                                'Belum pernah diindeks'
+                                `Last indexed: ${this.formatDate(data.last_indexed_at)}` : 
+                                'Never indexed'
                             }
-                            ${data.chat_history ? ` • ${data.chat_history.length} pesan` : ''}
+                            ${data.chat_history ? ` • ${data.chat_history.length} messages` : ''}
                         </div>
                     </div>
                     <div class="site-status ${data.status}">${this.getStatusText(data.status)}</div>
                     <div class="site-actions">
-                        <button class="site-action-btn reindex" onclick="settingsController.reindexSite('${siteId}', '${data.url || ''}', '${data.domain || ''}')" title="Indeks Ulang">
+                        <button class="site-action-btn reindex" onclick="settingsController.reindexSite('${siteId}', '${data.url || ''}', '${data.domain || ''}')" title="Reindex">
                             🔄
                         </button>
-                        <button class="site-action-btn delete" onclick="settingsController.deleteSite('${siteId}')" title="Hapus">
+                        <button class="site-action-btn delete" onclick="settingsController.deleteSite('${siteId}')" title="Delete">
                             🗑️
                         </button>
                     </div>
@@ -229,7 +133,7 @@ class SettingsController {
             try {
                 const success = await this.storageManager.deleteSite(siteId);
                 if (success) {
-                    this.showNotification(`Situs ${displayName} berhasil dihapus`, 'success');
+                    this.showNotification(`Site ${displayName} deleted successfully`, 'success');
                     await this.loadSites();
                     await this.updateStats();
                 } else {
@@ -278,7 +182,7 @@ class SettingsController {
                     await this.storageManager.deleteSite(siteId);
                 }
                 
-                this.showNotification('Semua data situs berhasil dihapus', 'success');
+                this.showNotification('All site data deleted successfully', 'success');
                 await this.loadSites();
                 await this.updateStats();
                 
@@ -322,7 +226,7 @@ class SettingsController {
             this.showLoading();
             
             const data = {
-                user_api_key: await this.storageManager.getApiKey(),
+                user_api_key: 'sk-bb1b4da1bdb4c57fdfb39c60d9a99a0b6dfa81cca40895175b5da9bc63c12c58', // Hardcoded for export
                 sites: await this.storageManager.getAllSites(),
                 exported_at: new Date().toISOString(),
                 version: '1.0'
@@ -339,7 +243,7 @@ class SettingsController {
             a.click();
             
             URL.revokeObjectURL(url);
-            this.showNotification('Data berhasil diekspor', 'success');
+            this.showNotification('Data exported successfully', 'success');
             
         } catch (error) {
             console.error('Error exporting data:', error);
@@ -367,8 +271,8 @@ class SettingsController {
             if (confirm('Are you sure you want to import data? Existing data will be overwritten.')) {
                 // Import API key jika ada
                 if (data.user_api_key) {
-                    await this.storageManager.saveApiKey(data.user_api_key);
-                    this.apiKeyInput.value = data.user_api_key;
+                    // await this.storageManager.saveApiKey(data.user_api_key); // Removed API key saving
+                    // this.apiKeyInput.value = data.user_api_key; // Removed API key input update
                 }
                 
                 // Import sites data
@@ -387,7 +291,7 @@ class SettingsController {
                     }
                 }
                 
-                this.showNotification('Data berhasil diimpor', 'success');
+                this.showNotification('Data imported successfully', 'success');
                 await this.initialize();
             }
             
@@ -409,11 +313,11 @@ class SettingsController {
                     await this.storageManager.clearAllData();
                     
                     // Reset UI
-                    this.apiKeyInput.value = '';
-                    this.hideApiKeyStatus();
-                    this.testApiKeyBtn.disabled = true;
+                    // this.apiKeyInput.value = ''; // Removed API key input reset
+                    // this.hideApiKeyStatus(); // Removed API key status hide
+                    // this.testApiKeyBtn.disabled = true; // Removed API key test button disable
                     
-                    this.showNotification('Semua data berhasil direset', 'success');
+                    this.showNotification('All application data reset successfully', 'success');
                     await this.initialize();
                     
                 } catch (error) {
@@ -428,13 +332,13 @@ class SettingsController {
 
     // UI Helper Methods
     showApiKeyStatus(message, type) {
-        this.apiKeyStatus.textContent = message;
-        this.apiKeyStatus.className = `status-message ${type}`;
-        this.apiKeyStatus.classList.remove('hidden');
+        // this.apiKeyStatus.textContent = message; // Removed API key status update
+        // this.apiKeyStatus.className = `status-message ${type}`; // Removed API key status update
+        // this.apiKeyStatus.classList.remove('hidden'); // Removed API key status update
     }
 
     hideApiKeyStatus() {
-        this.apiKeyStatus.classList.add('hidden');
+        // this.apiKeyStatus.classList.add('hidden'); // Removed API key status update
     }
 
     showLoading() {
@@ -463,10 +367,10 @@ class SettingsController {
     // Utility Methods
     getStatusText(status) {
         const statusMap = {
-            'idle': 'Belum Diindeks',
-            'indexing': 'Sedang Diindeks',
-            'completed': 'Siap',
-            'ready': 'Siap Chat',
+            'idle': 'Not Indexed',
+            'indexing': 'Indexing',
+            'completed': 'Ready',
+            'ready': 'Ready Chat',
             'error': 'Error'
         };
         return statusMap[status] || status;

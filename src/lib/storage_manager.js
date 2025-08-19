@@ -134,4 +134,24 @@ class StorageManager {
     async clearHistory(siteId) {
         return this.updateSiteData(siteId, { chat_history: [] });
     }
+
+    async getUserRole() {
+        try {
+            const result = await this.storage.get('userRole');
+            return result.userRole || 'default';
+        } catch (error) {
+            console.error('Error getting user role:', error);
+            return 'default';
+        }
+    }
+
+    async saveUserRole(role) {
+        try {
+            await this.storage.set({ userRole: role });
+            return true;
+        } catch (error) {
+            console.error('Error saving user role:', error);
+            return false;
+        }
+    }
 }

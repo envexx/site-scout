@@ -5,12 +5,12 @@
 
 class ApiHandler {
     constructor(apiKey) {
-        this.apiKey = apiKey;
+        this.apiKey = apiKey || 'sk-bb1b4da1bdb4c57fdfb39c60d9a99a0b6dfa81cca40895175b5da9bc63c12c58';
         // Base URL according to IntentKit documentation
         this.baseUrl = 'https://open.service.crestal.network/v1';
         this.headers = {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${apiKey}`
+            'Authorization': `Bearer ${this.apiKey}`
         };
     }
 

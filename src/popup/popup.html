@@ -349,13 +349,7 @@
             letter-spacing: 0.05em;
         }
 
-        .chat-history {
-            flex: 1;
-            overflow-y: auto;
-            padding: 14px;
-            min-height: 180px;
-            max-height: 350px;
-        }
+        /* .chat-history styling removed */
 
         .chat-input-container {
             padding: 14px;
@@ -543,22 +537,13 @@
         }
 
         /* Custom Scrollbar - Chat History */
-        .chat-history::-webkit-scrollbar {
-            width: 4px;
-        }
+        /* .chat-history::-webkit-scrollbar styling removed */
 
-        .chat-history::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.03);
-        }
+        /* .chat-history::-webkit-scrollbar-track styling removed */
 
-        .chat-history::-webkit-scrollbar-thumb {
-            background: var(--accent-gradient);
-            border-radius: 2px;
-        }
+        /* .chat-history::-webkit-scrollbar-thumb styling removed */
 
-        .chat-history::-webkit-scrollbar-thumb:hover {
-            background: var(--primary-gradient);
-        }
+        /* .chat-history::-webkit-scrollbar-thumb:hover styling removed */
 
         /* HIDE ALL SCROLLBARS COMPLETELY FOR INPUT */
         #questionInput::-webkit-scrollbar {
@@ -571,10 +556,7 @@
         }
 
         /* Firefox Scrollbar Support */
-        .chat-history {
-            scrollbar-width: thin;
-            scrollbar-color: rgba(79, 172, 254, 0.6) rgba(255, 255, 255, 0.03);
-        }
+        /* .chat-history (Firefox) styling removed */
 
         /* Input scrollbar removed - handled above */
 
@@ -660,10 +642,8 @@
         }
 
         .chat-message-text {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid var(--glass-border);
             border-radius: 10px;
-            padding: 10px 12px;
+            padding: 10px 17px;
             color: var(--text-primary);
             line-height: 1.4;
             font-size: 13px;
@@ -675,18 +655,15 @@
         }
 
         .chat-message.user .chat-message-text {
-            background: var(--primary-gradient);
             color: white;
             margin-left: 16px;
         }
 
         .chat-message.agent .chat-message-text {
-            background: rgba(255, 255, 255, 0.1);
             margin-right: 16px;
         }
 
         .chat-message.system .chat-message-text {
-            background: rgba(245, 158, 11, 0.1);
             border-color: rgba(245, 158, 11, 0.2);
             color: var(--text-secondary);
             font-style: italic;
@@ -1301,11 +1278,9 @@
         <!-- Header - Simplified -->
         <div class="header">
             <button id="settingsBtn" class="settings-btn" title="Settings">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="3"></circle>
-                    <path d="m12 1 0 6m0 6 0 6"></path>
-                    <path d="m20.49 8.5-5.2 3m-2.58 1.5-5.2 3"></path>
-                    <path d="M3.51 8.5l5.2 3m2.58 1.5 5.2 3"></path>
+                <!-- Ganti SVG menjadi ikon kunci inggris (wrench) -->
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22.7 19.3l-2.4-2.4a2 2 0 0 0-2.8 0l-1.1 1.1a2 2 0 0 1-2.8 0l-5.6-5.6a2 2 0 0 1 0-2.8l1.1-1.1a2 2 0 0 0 0-2.8L4.7 1.3a2 2 0 0 0-2.8 0l-1.1 1.1a2 2 0 0 0 0 2.8l2.4 2.4a2 2 0 0 1 0 2.8l-1.1 1.1a2 2 0 0 0 0 2.8l5.6 5.6a2 2 0 0 0 2.8 0l1.1-1.1a2 2 0 0 1 2.8 0l2.4 2.4a2 2 0 0 0 2.8 0l1.1-1.1a2 2 0 0 0 0-2.8z"></path>
                 </svg>
             </button>
 
@@ -1316,21 +1291,6 @@
             <div class="status-indicator">
                 <span class="status-dot"></span>
                 <span class="site-status" id="siteStatus">Ready to Chat</span>
-            </div>
-        </div>
-
-        <!-- View when there is no API key -->
-        <div id="noApiKeyView" class="view">
-            <div class="welcome-card">
-                <div class="welcome-icon">
-                    <img src="../../icons/logo.png" alt="Welcome" width="40" height="40">
-                </div>
-                <h2>Welcome!</h2>
-                <p>To use Site Scout, please enter your IntentKit API key first.</p>
-                <button id="openSettingsBtn" class="btn btn-primary">
-                    <span class="btn-icon">🔧</span>
-                    Open Settings
-                </button>
             </div>
         </div>
 
@@ -1354,7 +1314,7 @@
                 <!-- Area chat -->
                 <div class="chat-container">
                     <div class="chat-header">
-                        <span>Chat with AI</span>
+                        <span style="display: flex; align-items: center;"><img src="../../icons/logo.png" alt="Site Scout AI" width="16" height="16" style="vertical-align: middle; margin-right: 4px;"> Site Scout AI</span>
                     </div>
 
                     <div class="chat-history" id="chatHistory">

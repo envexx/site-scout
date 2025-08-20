@@ -371,3 +371,236 @@ body::before {
     }
 }
 
+/* ===== BADGE STYLING FOR AGENT RESPONSES ===== */
+
+/* Badge Container */
+.agent-response-badge {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 16px;
+    margin: 12px 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.agent-response-badge:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    border-color: #cbd5e1;
+}
+
+/* Badge Header */
+.badge-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.badge-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.badge-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+}
+
+/* Badge Content */
+.badge-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.badge-item {
+    display: flex;
+    align-items: flex-start;
+    padding: 8px 12px;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #f1f5f9;
+    transition: all 0.2s ease;
+}
+
+.badge-item:hover {
+    background: #f8fafc;
+    border-color: #e2e8f0;
+    transform: translateX(2px);
+}
+
+.badge-label {
+    font-weight: 600;
+    color: #475569;
+    min-width: 80px;
+    margin-right: 12px;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge-value {
+    color: #1e293b;
+    font-size: 14px;
+    line-height: 1.4;
+    flex: 1;
+}
+
+/* Specific Badge Types */
+.badge-overview {
+    border-left: 4px solid #3b82f6;
+}
+
+.badge-overview .badge-icon {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    color: white;
+}
+
+.badge-highlights {
+    border-left: 4px solid #10b981;
+}
+
+.badge-highlights .badge-icon {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+}
+
+.badge-insights {
+    border-left: 4px solid #f59e0b;
+}
+
+.badge-insights .badge-icon {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: white;
+}
+
+/* Badge List Items */
+.badge-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.badge-list-item {
+    padding: 6px 0;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    align-items: flex-start;
+}
+
+.badge-list-item:last-child {
+    border-bottom: none;
+}
+
+.badge-list-bullet {
+    width: 6px;
+    height: 6px;
+    background: #3b82f6;
+    border-radius: 50%;
+    margin: 8px 8px 0 0;
+    flex-shrink: 0;
+}
+
+.badge-list-text {
+    color: #374151;
+    font-size: 14px;
+    line-height: 1.5;
+    flex: 1;
+}
+
+/* Badge Highlights Section */
+.badge-highlights .badge-content {
+    gap: 12px;
+}
+
+.badge-highlights .badge-item {
+    background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+    border-color: #bbf7d0;
+}
+
+.badge-highlights .badge-item:hover {
+    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+    border-color: #86efac;
+}
+
+/* Badge Insights Section */
+.badge-insights .badge-item {
+    background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+    border-color: #fde68a;
+}
+
+.badge-insights .badge-item:hover {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border-color: #fbbf24;
+}
+
+/* Responsive Badge Design */
+@media (max-width: 480px) {
+    .agent-response-badge {
+        padding: 12px;
+        margin: 8px 0;
+    }
+    
+    .badge-header {
+        margin-bottom: 10px;
+        padding-bottom: 6px;
+    }
+    
+    .badge-title {
+        font-size: 14px;
+    }
+    
+    .badge-item {
+        padding: 6px 8px;
+    }
+    
+    .badge-label {
+        min-width: 60px;
+        font-size: 12px;
+    }
+    
+    .badge-value {
+        font-size: 13px;
+    }
+}
+
+/* Badge Animation */
+@keyframes badgeSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.agent-response-badge {
+    animation: badgeSlideIn 0.4s ease-out;
+}
+
+/* Badge Glow Effect */
+.badge-overview:hover {
+    box-shadow: 0 4px 20px rgba(59, 130, 246, 0.15);
+}
+
+.badge-highlights:hover {
+    box-shadow: 0 4px 20px rgba(16, 185, 129, 0.15);
+}
+
+.badge-insights:hover {
+    box-shadow: 0 4px 20px rgba(245, 158, 11, 0.15);
+}
+

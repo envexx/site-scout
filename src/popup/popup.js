@@ -46,33 +46,39 @@ class PopupController {
         this.settingsBtn = document.getElementById('settingsBtn');
         this.indexSiteBtn = document.getElementById('indexSiteBtn');
         this.sendQuestionBtn = document.getElementById('sendQuestionBtn');
-        this.reindexBtn = document.getElementById('reindexBtn');
-        this.clearHistoryBtn = document.getElementById('clearHistoryBtn');
         this.retryIndexBtn = document.getElementById('retryIndexBtn');
     }
 
     bindEvents() {
         // Settings buttons
-        this.settingsBtn.addEventListener('click', () => this.openSettings());
+        if (this.settingsBtn) {
+            this.settingsBtn.addEventListener('click', () => this.openSettings());
+        }
         
         // Main actions
-        this.indexSiteBtn.addEventListener('click', () => this.startIndexing());
-        this.sendQuestionBtn.addEventListener('click', () => this.sendQuestion());
-        this.reindexBtn.addEventListener('click', () => this.triggerFreshAnalysis());
-        this.clearHistoryBtn.addEventListener('click', () => this.clearChatHistory());
-        this.retryIndexBtn.addEventListener('click', () => this.startIndexing());
+        if (this.indexSiteBtn) {
+            this.indexSiteBtn.addEventListener('click', () => this.startIndexing());
+        }
+        if (this.sendQuestionBtn) {
+            this.sendQuestionBtn.addEventListener('click', () => this.sendQuestion());
+        }
+        if (this.retryIndexBtn) {
+            this.retryIndexBtn.addEventListener('click', () => this.startIndexing());
+        }
         
         // Input events
-        this.questionInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                this.sendQuestion();
-            }
-        });
-        
-        this.questionInput.addEventListener('input', () => {
-            this.autoResizeTextarea();
-        });
+        if (this.questionInput) {
+            this.questionInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    this.sendQuestion();
+                }
+            });
+            
+            this.questionInput.addEventListener('input', () => {
+                this.autoResizeTextarea();
+            });
+        }
     }
 
     async initialize() {
@@ -236,9 +242,9 @@ class PopupController {
              message.text.includes('🎯 CONTENT ANALYSIS:') || 
              message.text.includes('📝 KEY POINTS:') ||
              message.text.includes('💡 INSIGHTS & RECOMMENDATIONS:') ||
-             message.text.includes('🎯 ANALISIS KONTEN:') || 
-             message.text.includes('📝 POIN PENTING:') ||
-             message.text.includes('💡 INSIGHT & REKOMENDASI:'))
+                          message.text.includes('🎯 CONTENT ANALYSIS:') ||
+             message.text.includes('📝 KEY POINTS:') ||
+             message.text.includes('💡 INSIGHTS & RECOMMENDATIONS:'))
         );
 
         // Detect duplicates
@@ -400,41 +406,91 @@ class PopupController {
             this.updateAnalysisProgress('Connecting to Site Scout AI...', 15);
             await new Promise(resolve => setTimeout(resolve, 1000));
             this.updateAnalysisProgress('Starting webpage analysis...', 30);
-            // Ambil role aktif
+            // Get active role
             const role = await this.getActiveRole();
-            // Prompt role-based
+            // Role-based prompt instruction
             let roleInstruction = '';
             if (role === 'developer') {
-                roleInstruction = '\nFokuskan analisis pada insight teknis, struktur kode, dan highlight implementasi/development.';
+                roleInstruction = '\nFocus analysis on technical insights, code structure, and implementation/development highlights.';
             } else if (role === 'business') {
-                roleInstruction = '\nSorot insight bisnis, strategi, peluang pasar, dan aspek komersial.';
+                roleInstruction = '\nHighlight business insights, strategy, market opportunities, and commercial aspects.';
             } else if (role === 'researcher') {
-                roleInstruction = '\nFokus pada ringkasan ilmiah, data, insight penelitian, dan temuan penting.';
+                roleInstruction = '\nFocus on scientific summary, data, research insights, and important findings.';
             } else {
-                roleInstruction = '\nBerikan ringkasan umum dan insight yang mudah dipahami.';
+                roleInstruction = '\nProvide general summary and easily understandable insights.';
             }
-            // Prompt utama
-            const summaryRequest = `As Site Scout AI, I will analyze the following webpage using the 'web_crawler.crawl_and_index_website' skill: ${this.currentUrl}${roleInstruction}
-\nCrawling Parameters:\n- Depth: 1 (main page only)\n- Focus: Extract and analyze the main content of this specific page\n\nTask: Provide a concise, focused summary in this format:\n\n🎯 **OVERVIEW:**\n- Type: [website category]\n- Main Topic: [key subject in 1-2 sentences]\n- Target Audience: [who this is for]\n\n📝 **KEY HIGHLIGHTS:**\n- [3-4 most important points, keep each point brief]\n\n💡 **QUICK INSIGHTS:**\n- [What users can learn/gain - 1-2 sentences]\n- [Suggested follow-up questions - 1-2 examples]\n\nKeep the entire summary under 150 words. Be concise, informative, and engaging. Focus on the most essential information that users need to know.`;
+            // Main prompt - MUST analyze the webpage automatically
+            const summaryRequest = `You are Site Scout AI, a specialized web page analyzer. Your task is to AUTOMATICALLY analyze the following webpage using the 'web_crawler.crawl_and_index_website' skill: ${this.currentUrl}
+
+IMPORTANT: You MUST use the web_crawler.crawl_and_index_website skill to analyze this page. Do NOT ask questions or wait for user input. Start the analysis immediately.
+
+${roleInstruction}
+
+Crawling Parameters:
+- URL: ${this.currentUrl}
+- Depth: 1 (main page content only)
+- Focus: Extract and analyze the main content of this specific page
+
+REQUIRED OUTPUT FORMAT (you must follow this exactly):
+
+🎯 **OVERVIEW:**
+- Type: [website category]
+- Main Topic: [key subject in 1-2 sentences]
+- Target Audience: [who this is for]
+
+📝 **KEY HIGHLIGHTS:**
+- [3-4 most important points, keep each point brief]
+
+💡 **QUICK INSIGHTS:**
+- [What users can learn/gain - 1-2 sentences]
+- [Suggested follow-up questions - 1-2 examples]
+
+Rules:
+1. Start analysis immediately using web_crawler.crawl_and_index_website
+2. Keep the entire summary under 150 words
+3. Be concise, informative, and engaging
+4. Focus on the most essential information that users need to know
+5. Do NOT ask questions - just analyze and provide the summary`;
             this.updateAnalysisProgress('Gathering page information...', 40);
             await new Promise(resolve => setTimeout(resolve, 800));
             this.updateAnalysisProgress('Processing page content...', 60);
-            // Kirim request summary ke API
+            // Send analysis request to API
             console.log('📤 Sending analysis request to API...');
+            console.log('📝 Full prompt being sent:', summaryRequest);
             const summary = await this.apiHandler.sendMessage(chatId, summaryRequest);
-            console.log('📥 Received summary from API:', summary.substring(0, 100) + '...');
+            console.log('📥 Received summary from API:', summary.substring(0, 200) + '...');
+            console.log('📊 Summary length:', summary.length);
+            console.log('🔍 Summary contains crawling:', summary.toLowerCase().includes('crawl'));
+            console.log('🔍 Summary contains overview:', summary.toLowerCase().includes('overview'));
             
             // Update progress before checking response
             this.updateAnalysisProgress('Compiling analysis results...', 80);
             
-            // Check if response is an error (like insufficient credits, URL depth errors, etc.)
-            if (summary.toLowerCase().includes('insufficient credits') || 
-                summary.toLowerCase().includes('url depth error') ||
-                summary.toLowerCase().includes('error occurred') ||
-                summary.toLowerCase().includes('failed') ||
-                summary.toLowerCase().includes('could you please confirm') ||
-                summary.toLowerCase().includes('alternatively, i can provide')) {
-                console.warn('⚠️ API returned error response, hiding animation early');
+            // Check if response is an error or generic response
+            const isGenericResponse = summary.toLowerCase().includes('how can i assist') || 
+                                    summary.toLowerCase().includes('how can i help') ||
+                                    summary.toLowerCase().includes('what would you like') ||
+                                    summary.toLowerCase().includes('please provide') ||
+                                    summary.toLowerCase().includes('if you have any') ||
+                                    summary.toLowerCase().includes('insufficient credits') || 
+                                    summary.toLowerCase().includes('url depth error') ||
+                                    summary.toLowerCase().includes('error occurred') ||
+                                    summary.toLowerCase().includes('failed') ||
+                                    summary.toLowerCase().includes('could you please confirm') ||
+                                    summary.toLowerCase().includes('alternatively, i can provide');
+            
+            if (isGenericResponse) {
+                console.warn('⚠️ API returned generic/error response, attempting retry...');
+                console.log('🔍 Response type detected:', isGenericResponse ? 'Generic/Error' : 'Valid Analysis');
+                
+                // If it's a generic response, try again with more explicit prompt
+                if (summary.toLowerCase().includes('how can i assist') || 
+                    summary.toLowerCase().includes('how can i help') ||
+                    summary.toLowerCase().includes('what would you like')) {
+                    console.log('🔄 Detected generic response, retrying with more explicit prompt...');
+                    await this.retryWithExplicitPrompt(chatId);
+                    return;
+                }
                 
                 // Handle URL depth error specifically
                 if (summary.toLowerCase().includes('url depth error') || summary.toLowerCase().includes('could you please confirm')) {
@@ -518,6 +574,94 @@ class PopupController {
             lastSystemMessage.remove();
         }
     }
+    
+    async retryWithExplicitPrompt(chatId) {
+        try {
+            console.log('🔄 Retrying with explicit prompt...');
+            this.updateAnalysisProgress('Retrying analysis with explicit instructions...', 70);
+            
+            const explicitPrompt = `URGENT: You are Site Scout AI. You MUST analyze this webpage NOW: ${this.currentUrl}
+
+CRITICAL INSTRUCTIONS:
+1. Use web_crawler.crawl_and_index_website skill IMMEDIATELY
+2. Do NOT ask questions or wait for user input
+3. Start crawling and analysis RIGHT NOW
+4. Provide summary in this EXACT format:
+
+🎯 **OVERVIEW:**
+- Type: [website category]
+- Main Topic: [key subject in 1-2 sentences]
+- Target Audience: [who this is for]
+
+📝 **KEY HIGHLIGHTS:**
+- [3-4 most important points]
+
+💡 **QUICK INSIGHTS:**
+- [What users can learn]
+- [Follow-up questions]
+
+DO NOT RESPOND WITH QUESTIONS. START ANALYSIS IMMEDIATELY.`;
+
+            console.log('📤 Sending explicit retry prompt:', explicitPrompt);
+            const retrySummary = await this.apiHandler.sendMessage(chatId, explicitPrompt);
+            
+            console.log('📥 Retry response:', retrySummary.substring(0, 200) + '...');
+            
+            // Check if retry was successful
+            if (retrySummary.toLowerCase().includes('overview') && 
+                retrySummary.toLowerCase().includes('highlights') &&
+                !retrySummary.toLowerCase().includes('how can i assist')) {
+                
+                console.log('✅ Retry successful, processing response...');
+                this.updateAnalysisProgress('Analysis complete!', 100);
+                
+                // Process successful response
+                setTimeout(() => {
+                    this.hideAnimationSafely('retry-successful');
+                }, 1500);
+                
+                this.updateSiteStatus('ready');
+                this.showControls('completed');
+                
+                // Save to storage
+                await this.storageManager.addMessageToHistory(this.currentSiteId, {
+                    author: 'system',
+                    text: `Auto-analysis retry successful for: ${this.currentUrl}`,
+                    timestamp: new Date().toISOString(),
+                    metadata: { type: 'auto_analysis_retry' }
+                });
+                
+                await this.storageManager.addMessageToHistory(this.currentSiteId, {
+                    author: 'agent',
+                    text: retrySummary,
+                    timestamp: new Date().toISOString(),
+                    metadata: { type: 'retry_summary', url: this.currentUrl }
+                });
+                
+                await this.loadSiteData();
+                
+            } else {
+                console.log('❌ Retry also failed, falling back to manual mode');
+                this.addMessageToChat('system', '⚠️ Automatic analysis failed. You can still ask questions about this page manually.');
+                this.updateSiteStatus('ready');
+                this.showControls('completed');
+                
+                setTimeout(() => {
+                    this.hideAnimationSafely('retry-failed');
+                }, 1000);
+            }
+            
+        } catch (error) {
+            console.error('❌ Error in retry:', error);
+            this.addMessageToChat('system', '⚠️ Analysis failed. You can still ask questions about this page manually.');
+            this.updateSiteStatus('ready');
+            this.showControls('completed');
+            
+            setTimeout(() => {
+                this.hideAnimationSafely('retry-error');
+            }, 1000);
+        }
+    }
 
     async handleDepthErrorFallback(chatId, originalError) {
         try {
@@ -525,14 +669,16 @@ class PopupController {
             this.updateLoadingMessage('🔄 Retrying analysis...', 'Using simplified crawling method...', 50);
             
             // Create a simplified request that explicitly requests main page only
-            const fallbackRequest = `I need to analyze this webpage: ${this.currentUrl}
+            const fallbackRequest = `You are Site Scout AI. You MUST analyze this webpage: ${this.currentUrl}
 
-Please use the 'web_crawler.crawl_and_index_website' skill with these specific parameters:
+CRITICAL: Use the 'web_crawler.crawl_and_index_website' skill immediately. Do NOT ask questions or wait for input.
+
+Parameters:
 - URL: ${this.currentUrl}
 - Depth: 1 (main page content only, no deep crawling)
 - Mode: Extract main content and key information from this single page
 
-Provide a brief summary in this format:
+REQUIRED OUTPUT FORMAT:
 
 🎯 **OVERVIEW:**
 - Type: [website category]
@@ -546,7 +692,11 @@ Provide a brief summary in this format:
 - [What users can learn from this page]
 - [1-2 follow-up question examples]
 
-Keep the summary under 150 words and focus on the main page content only.`;
+Rules:
+1. Start crawling immediately with web_crawler.crawl_and_index_website
+2. Keep summary under 150 words
+3. Focus on main page content only
+4. Do NOT ask questions - just analyze and provide summary`;
 
             this.updateLoadingMessage('🧠 Processing fallback...', 'AI is analyzing page content...', 80);
             
@@ -780,6 +930,7 @@ Keep the summary under 150 words and focus on the main page content only.`;
     }
 
     openSettings() {
+        console.log('Opening settings page...');
         chrome.runtime.openOptionsPage();
     }
 
@@ -808,38 +959,7 @@ Keep the summary under 150 words and focus on the main page content only.`;
         }
     }
 
-    /**
-     * Trigger fresh analysis for existing session (called manually by user)
-     */
-    async triggerFreshAnalysis() {
-        try {
-            console.log('🔄 User triggered fresh analysis (manual)...');
-            
-            // Reset animation flag dan tampilkan robot animation overlay
-            this.animationHidden = false;
-            if (window.animationController) {
-                window.animationController.showAnimation();
-                if (window.updateAnimationStatus) {
-                    window.updateAnimationStatus('Starting fresh analysis...');
-                }
-            }
-            
-            if (this.currentSiteData && this.currentSiteData.chat_id) {
-                await this.refreshSiteAnalysis();
-            } else {
-                // Jika tidak ada session, buat baru
-                await this.createAndStartChat();
-            }
-        } catch (error) {
-            console.error('❌ Error triggering fresh analysis:', error);
-            this.showError('Failed to start analysis. Please try again.');
-            
-            // Hide animation on error
-            setTimeout(() => {
-                this.hideAnimationSafely('reanalysis-error');
-            }, 1000);
-        }
-    }
+
 
     async pollIndexingStatus() {
         const pollInterval = setInterval(async () => {
@@ -876,8 +996,8 @@ Keep the summary under 150 words and focus on the main page content only.`;
             // Show typing indicator
             this.showTypingIndicator();
             
-            // Send question with URL context for on-demand crawling
-            const answer = await this.apiHandler.askQuestionWithContext(
+            // Send question with URL context for on-demand crawling using smart fallback
+            const answer = await this.apiHandler.askQuestionWithSmartFallback(
                 this.currentSiteData.chat_id,
                 question,
                 this.currentUrl
@@ -903,7 +1023,15 @@ Keep the summary under 150 words and focus on the main page content only.`;
         } catch (error) {
             console.error('Error sending question:', error);
             this.hideTypingIndicator();
-            this.showError('Failed to send question. Please try again.');
+            
+            // Smart error handling - try to provide helpful response
+            if (error.message.includes('Unable to process request after multiple attempts')) {
+                this.addMessageToChat('agent', `I'm having trouble analyzing this page directly. Let me try a different approach to help you with your question about "${question}". 
+
+I'll attempt to provide useful information based on what I can access. If you need specific details from this page, you might want to try asking a more general question or provide some context about what you're looking for.`);
+            } else {
+                this.showError('Failed to send question. Please try again.');
+            }
         }
     }
 
@@ -913,10 +1041,7 @@ Keep the summary under 150 words and focus on the main page content only.`;
     }
 
     addMessageToChat(author, text) {
-        // Suppress system/auto-analysis messages
-        if (author === 'system' || (typeof text === 'string' && text.includes('Auto-analysis started for:'))) {
-            return;
-        }
+        // Allow all message types to be displayed
         if (!this.chatHistory) {
             console.error('❌ chatHistory element not found!');
             return;
@@ -929,7 +1054,7 @@ Keep the summary under 150 words and focus on the main page content only.`;
         const messageDiv = document.createElement('div');
         messageDiv.className = `chat-message ${author}`;
         messageDiv.innerHTML = `
-            <div class="chat-message-author">${author === 'user' ? '👤 You' : ''}</div>
+            <div class="chat-message-author">${author === 'user' ? '👤 You' : author === 'agent' ? '🤖 AI' : 'ℹ️ System'}</div>
             <div class="chat-message-text">${formattedText}</div>
         `;
         this.chatHistory.appendChild(messageDiv);
@@ -1068,23 +1193,7 @@ Keep the summary under 150 words and focus on the main page content only.`;
         if (progressText) progressText.textContent = `${progress}%`;
     }
 
-    async clearChatHistory() {
-        if (!this.currentSiteId) return;
-        
-        if (confirm('Are you sure you want to delete all chat history?')) {
-            try {
-                const siteData = await this.storageManager.getSiteData(this.currentSiteId);
-                if (siteData) {
-                    siteData.chat_history = [];
-                    await this.storageManager.createSiteEntry(this.currentSiteId, siteData.chat_id, this.currentUrl, this.currentDomain);
-                    this.showEmptyChat();
-                }
-            } catch (error) {
-                console.error('Error clearing chat history:', error);
-                this.showError('Failed to delete chat history.');
-            }
-        }
-    }
+
 
     showTypingIndicator() {
         this.typingIndicator.classList.remove('hidden');
@@ -1279,7 +1388,7 @@ Keep the summary under 150 words and focus on the main page content only.`;
                 message.text && 
                 (message.text.includes('🎯 OVERVIEW:') || 
                  message.text.includes('🎯 CONTENT ANALYSIS:') ||
-                 message.text.includes('🎯 ANALISIS KONTEN:'))) {
+                 message.text.includes('🎯 CONTENT ANALYSIS:'))) {
                 analysisResponses.push({...message, index});
             }
         });
@@ -1328,30 +1437,248 @@ Keep the summary under 150 words and focus on the main page content only.`;
     }
 
     formatAgentResult(text) {
-        // Normalisasi: hapus bintang dua dan spasi ekstra
+        console.log('🔍 formatAgentResult called with text:', text.substring(0, 200) + '...');
+        
+        // Normalization: remove double asterisks and extra spaces
         let html = text.replace(/\*\*/g, '').replace(/\r/g, '');
+        
+        // Parse text to create structured badges
+        const sections = [];
+        
+        // Overview Section
+        const overviewMatch = html.match(/🎯\s*OVERVIEW:?/i);
+        console.log('🎯 Overview match:', overviewMatch);
+        if (overviewMatch) {
+            const overviewContent = this.extractOverviewContent(html);
+            console.log('📊 Overview content extracted:', overviewContent);
+            if (overviewContent && overviewContent.length > 0) {
+                sections.push(this.createOverviewBadge(overviewContent));
+            }
+        }
+        
+        // Key Highlights Section
+        const highlightsMatch = html.match(/📝\s*KEY HIGHLIGHTS:?/i);
+        console.log('📝 Highlights match:', highlightsMatch);
+        if (highlightsMatch) {
+            const highlightsContent = this.extractHighlightsContent(html);
+            console.log('📊 Highlights content extracted:', highlightsContent);
+            if (highlightsContent && highlightsContent.length > 0) {
+                sections.push(this.createHighlightsBadge(highlightsContent));
+            }
+        }
+        
+        // Quick Insights Section
+        const insightsMatch = html.match(/💡\s*QUICK INSIGHTS:?/i);
+        console.log('💡 Insights match:', insightsMatch);
+        if (insightsMatch) {
+            const insightsContent = this.extractInsightsContent(html);
+            console.log('📊 Insights content extracted:', insightsContent);
+            if (insightsContent && insightsContent.length > 0) {
+                sections.push(this.createInsightsBadge(insightsContent));
+            }
+        }
+        
+        console.log('🏷️ Total sections created:', sections.length);
+        
+        // If sections are successfully created, return badge HTML
+        if (sections.length > 0) {
+            console.log('✅ Returning badge HTML');
+            return sections.join('');
+        }
+        
+        // Fallback to old format if parsing fails
+        console.log('⚠️ No sections created, using fallback formatting');
+        return this.fallbackFormatting(html);
+    }
+    
+    extractOverviewContent(text) {
+        const overviewRegex = /🎯\s*OVERVIEW:?([\s\S]*?)(?=📝|💡|$)/i;
+        const match = text.match(overviewRegex);
+        if (!match) return null;
+        
+        const content = match[1].trim();
+        const items = [];
+        
+        // Extract Type, Main Topic, Target Audience with more flexible patterns
+        const typeMatch = content.match(/(?:Type|TYPE)\s*:?\s*(.+?)(?:\n|$)/i);
+        const topicMatch = content.match(/(?:Main Topic|MAIN TOPIC)\s*:?\s*(.+?)(?:\n|$)/i);
+        const audienceMatch = content.match(/(?:Target Audience|TARGET AUDIENCE)\s*:?\s*(.+?)(?:\n|$)/i);
+        
+        if (typeMatch) items.push({ label: 'Type', value: typeMatch[1].trim() });
+        if (topicMatch) items.push({ label: 'Main Topic', value: topicMatch[1].trim() });
+        if (audienceMatch) items.push({ label: 'Target Audience', value: audienceMatch[1].trim() });
+        
+        // If no structured items found, try to extract from plain text
+        if (items.length === 0) {
+            const lines = content.split('\n').filter(line => line.trim() && line.trim().length > 3);
+            if (lines.length >= 3) {
+                items.push({ label: 'Type', value: lines[0].trim() });
+                items.push({ label: 'Main Topic', value: lines[1].trim() });
+                items.push({ label: 'Target Audience', value: lines[2].trim() });
+            }
+        }
+        
+        return items;
+    }
+    
+    extractHighlightsContent(text) {
+        const highlightsRegex = /📝\s*KEY HIGHLIGHTS:?([\s\S]*?)(?=💡|$)/i;
+        const match = text.match(highlightsRegex);
+        if (!match) return null;
+        
+        const content = match[1].trim();
+        const items = [];
+        
+        // Extract bullet points with more flexible patterns
+        const lines = content.split('\n').filter(line => line.trim());
+        lines.forEach(line => {
+            let cleanLine = line.trim();
+            // Remove various bullet point indicators
+            cleanLine = cleanLine.replace(/^[-•*]\s*/, '');
+            cleanLine = cleanLine.replace(/^[0-9]+\.\s*/, '');
+            
+            if (cleanLine && cleanLine.length > 10) { // Minimum length for meaningful content
+                items.push(cleanLine);
+            }
+        });
+        
+        // If no items found, try to split by sentences
+        if (items.length === 0) {
+            const sentences = content.split(/[.!?]+/).filter(sentence => sentence.trim().length > 10);
+            items.push(...sentences.slice(0, 4)); // Max 4 highlights
+        }
+        
+        return items;
+    }
+    
+    extractInsightsContent(text) {
+        const insightsRegex = /💡\s*QUICK INSIGHTS:?([\s\S]*?)(?=\n\n|$)/i;
+        const match = text.match(insightsRegex);
+        if (!match) return null;
+        
+        const content = match[1].trim();
+        const items = [];
+        
+        // Extract insights and follow-up questions with more flexible patterns
+        const lines = content.split('\n').filter(line => line.trim());
+        lines.forEach(line => {
+            let cleanLine = line.trim();
+            // Remove various bullet point indicators
+            cleanLine = cleanLine.replace(/^[-•*]\s*/, '');
+            cleanLine = cleanLine.replace(/^[0-9]+\.\s*/, '');
+            
+            if (cleanLine && cleanLine.length > 10) { // Minimum length for meaningful content
+                items.push(cleanLine);
+            }
+        });
+        
+        // If no items found, try to split by sentences
+        if (items.length === 0) {
+            const sentences = content.split(/[.!?]+/).filter(sentence => sentence.trim().length > 10);
+            items.push(...sentences.slice(0, 3)); // Max 3 insights
+        }
+        
+        return items;
+    }
+    
+    createOverviewBadge(items) {
+        if (!items || items.length === 0) return '';
+        
+        const itemsHtml = items.map(item => `
+            <div class="badge-item">
+                <div class="badge-label">${item.label}</div>
+                <div class="badge-value">${item.value}</div>
+            </div>
+        `).join('');
+        
+        return `
+            <div class="agent-response-badge badge-overview">
+                <div class="badge-header">
+                    <div class="badge-icon">🎯</div>
+                    <h4 class="badge-title">OVERVIEW</h4>
+                </div>
+                <div class="badge-content">
+                    ${itemsHtml}
+                </div>
+            </div>
+        `;
+    }
+    
+    createHighlightsBadge(items) {
+        if (!items || items.length === 0) return '';
+        
+        const itemsHtml = items.map(item => `
+            <div class="badge-list-item">
+                <div class="badge-list-bullet"></div>
+                <div class="badge-list-text">${item}</div>
+            </div>
+        `).join('');
+        
+        return `
+            <div class="agent-response-badge badge-highlights">
+                <div class="badge-header">
+                    <div class="badge-icon">📝</div>
+                    <h4 class="badge-title">KEY HIGHLIGHTS</h4>
+                </div>
+                <div class="badge-content">
+                    <div class="badge-list">
+                        ${itemsHtml}
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    createInsightsBadge(items) {
+        if (!items || items.length === 0) return '';
+        
+        const itemsHtml = items.map(item => `
+            <div class="badge-list-item">
+                <div class="badge-list-bullet"></div>
+                <div class="badge-list-text">${item}</div>
+            </div>
+        `).join('');
+        
+        return `
+            <div class="agent-response-badge badge-insights">
+                <div class="badge-header">
+                    <div class="badge-icon">💡</div>
+                    <h4 class="badge-title">QUICK INSIGHTS</h4>
+                </div>
+                <div class="badge-content">
+                    <div class="badge-list">
+                        ${itemsHtml}
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    fallbackFormatting(html) {
+        // Format lama sebagai fallback
+        let formatted = html;
         // Heading
-        html = html.replace(/🎯\s*OVERVIEW:?/i, '<h4 style="margin-bottom:4px">🎯 OVERVIEW</h4><ul style="margin-top:0">');
-        html = html.replace(/📝\s*KEY HIGHLIGHTS:?/i, '</ul><br><h4 style="margin-bottom:4px">📝 KEY HIGHLIGHTS</h4><ul style="margin-top:0">');
-        html = html.replace(/💡\s*QUICK INSIGHTS:?/i, '</ul><br><h4 style="margin-bottom:4px">💡 QUICK INSIGHTS</h4><ul style="margin-top:0">');
+        formatted = formatted.replace(/🎯\s*OVERVIEW:?/i, '<h4 style="margin-bottom:4px">🎯 OVERVIEW</h4><ul style="margin-top:0">');
+        formatted = formatted.replace(/📝\s*KEY HIGHLIGHTS:?/i, '</ul><br><h4 style="margin-bottom:4px">📝 KEY HIGHLIGHTS</h4><ul style="margin-top:0">');
+        formatted = formatted.replace(/💡\s*QUICK INSIGHTS:?/i, '</ul><br><h4 style="margin-bottom:4px">💡 QUICK INSIGHTS</h4><ul style="margin-top:0">');
         // Bullet point: baris diawali - atau baris setelah heading
-        html = html.replace(/\n-\s*/g, '\n<li>');
-        html = html.replace(/<ul style="margin-top:0">\s*([^<\n-]+)/g, function(match, p1) {
+        formatted = formatted.replace(/\n-\s*/g, '\n<li>');
+        formatted = formatted.replace(/<ul style="margin-top:0">\s*([^<\n-]+)/g, function(match, p1) {
             // Untuk baris pertama setelah heading tanpa -
             return `<ul style="margin-top:0"><li>${p1.trim()}`;
         });
         // Baris Type, Main Topic, Target Audience jadi bold
-        html = html.replace(/(<li>\s*)(Type|Main Topic|Target Audience):/g, '$1<b>$2:</b>');
+        formatted = formatted.replace(/(<li>\s*)(Type|Main Topic|Target Audience):/g, '$1<b>$2:</b>');
         // Tutup ul di akhir
-        if (html.match(/<ul/)) html += '</ul>';
+        if (formatted.match(/<ul/)) formatted += '</ul>';
         // Bersihkan double ul
-        html = html.replace(/<ul><ul>/g, '<ul>');
-        html = html.replace(/<\/ul><\/ul>/g, '</ul>');
+        formatted = formatted.replace(/<ul><ul>/g, '<ul>');
+        formatted = formatted.replace(/<\/ul><\/ul>/g, '</ul>');
         // Hapus <ul> kosong
-        html = html.replace(/<ul style="margin-top:0">\s*<\/ul>/g, '');
+        formatted = formatted.replace(/<ul style="margin-top:0">\s*<\/ul>/g, '');
         // Hapus <li> kosong
-        html = html.replace(/<li>\s*<\/li>/g, '');
-        return html;
+        formatted = formatted.replace(/<li>\s*<\/li>/g, '');
+        return formatted;
     }
 }
 
@@ -1359,4 +1686,92 @@ Keep the summary under 150 words and focus on the main page content only.`;
 
 document.addEventListener('DOMContentLoaded', () => {
     new PopupController();
+    
+    // Enhanced chat input functionality
+    const questionInput = document.getElementById('questionInput');
+    const sendBtn = document.getElementById('sendQuestionBtn');
+    const charCount = document.getElementById('charCount');
+    
+    if (questionInput && sendBtn && charCount) {
+        // Auto-resize textarea
+        questionInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+            
+            // Update character count
+            const count = this.value.length;
+            charCount.textContent = count;
+            
+            // Enable/disable send button
+            sendBtn.disabled = this.value.trim().length === 0;
+            
+            // Color change for character limit
+            if (count > 450) {
+                charCount.style.color = '#ef4444';
+            } else if (count > 400) {
+                charCount.style.color = '#f59e0b';
+            } else {
+                charCount.style.color = '#9ca3af';
+            }
+        });
+        
+        // Send button click
+        sendBtn.addEventListener('click', function() {
+            if (questionInput.value.trim()) {
+                // Trigger the existing send question functionality
+                const event = new Event('click');
+                document.getElementById('sendQuestionBtn').dispatchEvent(event);
+            }
+        });
+        
+        // Ensure send button is properly enabled/disabled
+        function updateSendButtonState() {
+            if (sendBtn && questionInput) {
+                const hasText = questionInput.value.trim().length > 0;
+                sendBtn.disabled = !hasText;
+                
+                // Visual feedback
+                if (hasText) {
+                    sendBtn.style.opacity = '1';
+                    sendBtn.style.cursor = 'pointer';
+                } else {
+                    sendBtn.style.opacity = '0.6';
+                    sendBtn.style.cursor = 'not-allowed';
+                }
+            }
+        }
+        
+        // Update button state on input
+        questionInput.addEventListener('input', updateSendButtonState);
+        
+        // Initial state
+        updateSendButtonState();
+        
+        // Enter key to send (Shift+Enter for new line)
+        questionInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                if (this.value.trim()) {
+                    // Trigger the existing send question functionality
+                    const event = new Event('click');
+                    document.getElementById('sendQuestionBtn').dispatchEvent(event);
+                }
+            }
+        });
+        
+        // Focus management
+        questionInput.addEventListener('focus', function() {
+            this.parentElement.parentElement.style.transform = 'translateY(-2px)';
+        });
+        
+        questionInput.addEventListener('blur', function() {
+            if (!this.value) {
+                this.parentElement.parentElement.style.transform = 'translateY(0)';
+            }
+        });
+    }
+    
+    // Settings Button Functionality - REMOVED DUPLICATE EVENT LISTENER
+    // The settings button is already handled in the PopupController class constructor
+    console.log('Settings button functionality is handled by PopupController class');
 });

@@ -2,14 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Site Scout Settings</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="settings.css">
 </head>
-<body>
+<body style="overflow-y: auto; overflow-x: hidden; height: auto; min-height: 100vh;">
     <div class="container">
         <header class="header">
             <h1><img src="../../icons/logo.png" alt="Site Scout AI" width="24" height="24" style="vertical-align: middle"> Site Scout AI</h1>
@@ -50,6 +52,19 @@
                 <div class="form-actions">
                     <button id="refreshSitesBtn" class="secondary-btn">🔄 Refresh</button>
                     <button id="clearAllSitesBtn" class="danger-btn">🗑️ Clear All</button>
+                </div>
+            </section>
+
+            <!-- Site Management Section -->
+            <section class="settings-section">
+                <h2>⚙️ Site Management</h2>
+                <p class="section-description">
+                    Manage and control your indexed sites.
+                </p>
+
+                <div class="form-actions">
+                    <button id="reindexBtn" class="primary-btn">🔄 Re-analyze Current Site</button>
+                    <button id="clearHistoryBtn" class="secondary-btn">🗑️ Clear Chat History</button>
                 </div>
             </section>
 

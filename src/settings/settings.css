@@ -5,6 +5,42 @@
     box-sizing: border-box;
 }
 
+/* Ensure scrolling works properly */
+html {
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+    height: 100%;
+}
+
+body {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    position: relative;
+    margin: 0;
+    padding: 0;
+}
+
+/* Custom scrollbar for webkit browsers */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
 :root {
     --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
@@ -30,6 +66,7 @@ body {
     color: var(--text-primary);
     min-height: 100vh;
     overflow-x: hidden;
+    overflow-y: auto;
     position: relative;
     margin: 0;
     padding: 0;
@@ -47,6 +84,7 @@ body::before {
                 radial-gradient(circle at 40% 40%, rgba(79, 172, 254, 0.1) 0%, transparent 50%);
     animation: float 20s ease-in-out infinite;
     z-index: -1;
+    pointer-events: none;
 }
 
 @keyframes float {
@@ -62,6 +100,7 @@ body::before {
     min-height: 100vh;
     position: relative;
     z-index: 1;
+    overflow-y: visible;
 }
 
 /* Header */
@@ -98,6 +137,8 @@ body::before {
     display: flex;
     flex-direction: column;
     gap: 24px;
+    overflow-y: visible;
+    padding-bottom: 40px;
 }
 
 /* Settings Section */
@@ -109,6 +150,7 @@ body::before {
     backdrop-filter: blur(20px);
     box-shadow: var(--shadow-lg);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    overflow: visible;
 }
 
 .settings-section:hover {
@@ -693,6 +735,7 @@ input[type="password"]::placeholder {
 @media (max-width: 768px) {
     .container {
         padding: 16px;
+        overflow-y: auto;
     }
     
     .header {
@@ -739,6 +782,15 @@ input[type="password"]::placeholder {
         right: 16px;
         left: 16px;
         min-width: auto;
+    }
+    
+    .main-content {
+        padding-bottom: 20px;
+    }
+    
+    body {
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
     }
 }
 
@@ -807,4 +859,82 @@ select option {
     color: var(--text-primary);
     border-radius: 8px;
     font-size: 14px;
+}
+
+/* Additional fixes for scrolling issues */
+html, body {
+    overflow-x: hidden;
+    overflow-y: auto;
+    height: auto;
+    min-height: 100vh;
+}
+
+.container {
+    overflow: visible;
+    height: auto;
+}
+
+.main-content {
+    overflow: visible;
+    height: auto;
+}
+
+/* Force enable scrolling */
+body {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+}
+
+/* Ensure all interactive elements are clickable */
+button, select, input, a {
+    pointer-events: auto;
+    cursor: pointer;
+}
+
+/* Remove any potential pointer-events blocking */
+.settings-section * {
+    pointer-events: auto;
+}
+
+/* Override any problematic CSS */
+html {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+}
+
+body {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    height: auto !important;
+    min-height: 100vh !important;
+}
+
+.container {
+    overflow: visible !important;
+    height: auto !important;
+}
+
+.main-content {
+    overflow: visible !important;
+    height: auto !important;
+}
+
+/* Fix for mobile devices */
+@media (max-width: 768px) {
+    body {
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch;
+        height: auto !important;
+        min-height: 100vh !important;
+    }
+    
+    .container {
+        overflow: visible !important;
+        height: auto !important;
+    }
+    
+    .main-content {
+        overflow: visible !important;
+        height: auto !important;
+    }
 }

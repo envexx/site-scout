@@ -115,7 +115,7 @@ class ApiHandler {
      */
     async askQuestionWithContext(chatId, question, url) {
         try {
-            // Create question with URL context for on-demand analysis with depth specification
+            // Create question with URL context for on-demand analysis with smart fallback
             const contextualMessage = `To answer the following question, please use the 'web_crawler.crawl_and_index_website' skill to analyze content from: ${url}
 
 Crawling Parameters:
@@ -123,6 +123,14 @@ Crawling Parameters:
 - Focus: Extract relevant information to answer the question
 
 Question: ${question}
+
+IMPORTANT INSTRUCTIONS:
+1. First try to analyze the URL with depth 1
+2. If crawling fails due to depth/URL structure issues, automatically try with depth 0 (single page only)
+3. If still fails, try alternative crawling methods or manual content extraction
+4. Always provide a helpful answer - never give up with error messages
+5. If you encounter limitations, briefly mention them at the bottom and continue with what you can provide
+6. Focus on being helpful rather than explaining technical limitations
 
 Please provide an accurate answer based on the content from that URL.`;
             
@@ -138,6 +146,80 @@ Please provide an accurate answer based on the content from that URL.`;
      */
     async askQuestion(chatId, question) {
         return await this.sendMessage(chatId, question);
+    }
+
+    /**
+     * Smart question handling with automatic fallback strategies
+     * @param {string} chatId - Chat thread ID
+     * @param {string} question - User question
+     * @param {string} url - URL to analyze
+     * @returns {Promise<string>} Agent response
+     */
+    async askQuestionWithSmartFallback(chatId, question, url) {
+        try {
+            // First attempt: Standard crawling with depth 1
+            const contextualMessage = `To answer the following question, please use the 'web_crawler.crawl_and_index_website' skill to analyze content from: ${url}
+
+Crawling Parameters:
+- Depth: 1 (main page content only)
+- Focus: Extract relevant information to answer the question
+
+Question: ${question}
+
+IMPORTANT INSTRUCTIONS:
+1. First try to analyze the URL with depth 1
+2. If crawling fails due to depth/URL structure issues, automatically try with depth 0 (single page only)
+3. If still fails, try alternative crawling methods or manual content extraction
+4. Always provide a helpful answer - never give up with error messages
+5. If you encounter limitations, briefly mention them at the bottom and continue with what you can provide
+6. Focus on being helpful rather than explaining technical limitations
+
+Please provide an accurate answer based on the content from that URL.`;
+            
+            return await this.sendMessage(chatId, contextualMessage);
+        } catch (error) {
+            console.error('Error with smart fallback approach:', error);
+            
+            // Second attempt: Try with depth 0 (single page only)
+            try {
+                console.log('Trying fallback with depth 0...');
+                const fallbackMessage = `To answer the following question, please use the 'web_crawler.crawl_and_index_website' skill to analyze content from: ${url}
+
+Crawling Parameters:
+- Depth: 0 (single page only - no subpages)
+- Focus: Extract relevant information to answer the question
+
+Question: ${question}
+
+IMPORTANT: If this still fails, provide helpful information based on what you can access. Don't give up with error messages.`;
+
+                return await this.sendMessage(chatId, fallbackMessage);
+            } catch (depthError) {
+                console.error('Depth 0 approach also failed:', depthError);
+                
+                // Third attempt: Manual approach without crawling
+                try {
+                    console.log('Trying manual approach...');
+                    const manualMessage = `Please help me with this question: "${question}"
+
+I'm trying to get information from: ${url}
+
+Since automated crawling isn't working, please:
+1. Try to provide helpful information based on what you know
+2. Suggest alternative approaches or sources
+3. Give a brief, helpful response
+4. If you have any relevant knowledge, share it
+5. Don't explain technical limitations in detail
+
+Focus on being helpful to the user.`;
+                    
+                    return await this.sendMessage(chatId, manualMessage);
+                } catch (manualError) {
+                    console.error('Manual approach also failed:', manualError);
+                    throw new Error('Unable to process request after multiple attempts');
+                }
+            }
+        }
     }
 
     /**

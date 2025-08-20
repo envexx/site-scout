@@ -21,9 +21,24 @@
 
 <h2>UI UPDATE</h2>
 <p>
-<img src="landing-page/picture/Screenshot_93.png" alt="Homepage" width="300">
-<img src="landing-page/picture/Screenshot_94.png" alt="Homepage" width="300">
+  <div style="display: flex; justify-content: space-around; align-items: center;">
+    <!-- Gambar 1 -->
+    <div>
+      <img src="landing-page/picture/Screenshot_93.png" alt="Homepage" width="300">
+    </div>
+
+    <!-- Gambar 2 -->
+    <div>
+      <img src="landing-page/picture/Screenshot_94.png" alt="Homepage" width="300">
+    </div>
+
+    <!-- Video Embed -->
+    <div>
+      <iframe width="300" height="169" src="https://www.youtube.com/embed/vOsI0_nHO4A" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+  </div>
 </p>
+
 
 ### 🆕 **Version 1.2.0 - Major Updates**
 - ✨ **Enhanced AI Response Formatting** - Intelligent detection and formatting of AI responses

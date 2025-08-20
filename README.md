@@ -20,7 +20,7 @@
 **Site Scout AI** is a sophisticated Chrome browser extension that leverages **nation.fun** artificial intelligence to revolutionize how you interact with web content. It automatically analyzes web pages, provides comprehensive summaries, and enables intelligent conversations about any webpage content through an advanced AI chat interface powered by nation.fun's cutting-edge AI technology.
 
 <h2>Screenshot</h2>
-<img src="landing-page/picuture/Screenshot_93.png" alt="Homepage" width="600">
+<img src="landing-page/picture/Screenshot_93.png" alt="Homepage" width="600">
 
 ### 🆕 **Version 1.2.0 - Major Updates**
 - ✨ **Enhanced AI Response Formatting** - Intelligent detection and formatting of AI responses

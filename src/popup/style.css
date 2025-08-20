@@ -441,13 +441,21 @@ body::before {
 }
 
 .badge-label {
-    font-weight: 600;
-    color: #475569;
+    font-weight: 700;
+    color: #374151;
     min-width: 80px;
     margin-right: 12px;
-    font-size: 13px;
+    font-size: 12px;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.8px;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    padding: 4px 8px;
+    border-radius: 6px;
+    border: 1px solid #cbd5e1;
+    display: inline-block;
+    text-align: center;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
 }
 
 .badge-value {
@@ -567,7 +575,9 @@ body::before {
     
     .badge-label {
         min-width: 60px;
-        font-size: 12px;
+        font-size: 11px;
+        padding: 3px 6px;
+        letter-spacing: 0.6px;
     }
     
     .badge-value {
@@ -587,6 +597,19 @@ body::before {
     }
 }
 
+@keyframes badgeLabelPulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+.badge-label {
+    animation: badgeLabelPulse 0.3s ease-out;
+}
+
 .agent-response-badge {
     animation: badgeSlideIn 0.4s ease-out;
 }
@@ -602,5 +625,47 @@ body::before {
 
 .badge-insights:hover {
     box-shadow: 0 4px 20px rgba(245, 158, 11, 0.15);
+}
+
+/* Badge Label Hover Effects */
+.badge-label:hover {
+    background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+    border-color: #94a3b8;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* Specific Badge Label Colors */
+.badge-overview .badge-label {
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    border-color: #93c5fd;
+    color: #1e40af;
+}
+
+.badge-overview .badge-label:hover {
+    background: linear-gradient(135deg, #bfdbfe 0%, #93c5fd 100%);
+    border-color: #60a5fa;
+}
+
+.badge-highlights .badge-label {
+    background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+    border-color: #86efac;
+    color: #166534;
+}
+
+.badge-highlights .badge-label:hover {
+    background: linear-gradient(135deg, #bbf7d0 0%, #86efac 100%);
+    border-color: #4ade80;
+}
+
+.badge-insights .badge-label {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border-color: #fbbf24;
+    color: #92400e;
+}
+
+.badge-insights .badge-label:hover {
+    background: linear-gradient(135deg, #fde68a 0%, #fbbf24 100%);
+    border-color: #f59e0b;
 }
 

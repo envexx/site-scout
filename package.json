@@ -2,7 +2,7 @@
   "name": "nation",
   "version": "1.0.0",
   "description": "**Agen Riset Kontekstual Berbasis Web**",
-  "main": "test_api.js",
+  "main": "src/popup/popup.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

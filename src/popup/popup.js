@@ -477,7 +477,11 @@ Rules:
                                     summary.toLowerCase().includes('error occurred') ||
                                     summary.toLowerCase().includes('failed') ||
                                     summary.toLowerCase().includes('could you please confirm') ||
-                                    summary.toLowerCase().includes('alternatively, i can provide');
+                                    summary.toLowerCase().includes('alternatively, i can provide') ||
+                                    summary.toLowerCase().includes('not recognized as valid') ||
+                                    summary.toLowerCase().includes('technical issue') ||
+                                    summary.toLowerCase().includes('crawling tool') ||
+                                    summary.toLowerCase().includes('recommend trying again');
             
             if (isGenericResponse) {
                 console.warn('⚠️ API returned generic/error response, attempting retry...');
@@ -492,9 +496,13 @@ Rules:
                     return;
                 }
                 
-                // Handle URL depth error specifically
-                if (summary.toLowerCase().includes('url depth error') || summary.toLowerCase().includes('could you please confirm')) {
-                    console.log('🔍 Detected URL depth error, attempting fallback analysis...');
+                // Handle URL depth error and crawling tool errors specifically
+                if (summary.toLowerCase().includes('url depth error') || 
+                    summary.toLowerCase().includes('could you please confirm') ||
+                    summary.toLowerCase().includes('not recognized as valid') ||
+                    summary.toLowerCase().includes('technical issue') ||
+                    summary.toLowerCase().includes('crawling tool')) {
+                    console.log('🔍 Detected crawling tool error, attempting fallback analysis...');
                     this.handleDepthErrorFallback(chatId, summary);
                     return;
                 }
@@ -564,7 +572,7 @@ Rules:
 
     removeTempMessage() {
         // Remove temporary loading message
-        const messages = this.chatHistory.querySelectorAll('.chat-message.system');
+        const messages = this.chatHistory.querySelectorAll('.message.system');
         const lastSystemMessage = messages[messages.length - 1];
         if (lastSystemMessage && (
             lastSystemMessage.textContent.includes('🔍 Analyzing') ||
@@ -675,7 +683,7 @@ CRITICAL: Use the 'web_crawler.crawl_and_index_website' skill immediately. Do NO
 
 Parameters:
 - URL: ${this.currentUrl}
-- Depth: 1 (main page content only, no deep crawling)
+- Depth: 0 (single page only, no subpages)
 - Mode: Extract main content and key information from this single page
 
 REQUIRED OUTPUT FORMAT:
@@ -696,7 +704,8 @@ Rules:
 1. Start crawling immediately with web_crawler.crawl_and_index_website
 2. Keep summary under 150 words
 3. Focus on main page content only
-4. Do NOT ask questions - just analyze and provide summary`;
+4. Do NOT ask questions - just analyze and provide summary
+5. If crawling fails, provide analysis based on URL structure and domain name`;
 
             this.updateLoadingMessage('🧠 Processing fallback...', 'AI is analyzing page content...', 80);
             
@@ -705,7 +714,10 @@ Rules:
             // Check if fallback also failed
             if (fallbackSummary.toLowerCase().includes('error') || 
                 fallbackSummary.toLowerCase().includes('failed') ||
-                fallbackSummary.toLowerCase().includes('could you please confirm')) {
+                fallbackSummary.toLowerCase().includes('could you please confirm') ||
+                fallbackSummary.toLowerCase().includes('not recognized as valid') ||
+                fallbackSummary.toLowerCase().includes('technical issue') ||
+                fallbackSummary.toLowerCase().includes('crawling tool')) {
                 throw new Error('Fallback analysis also failed');
             }
             
@@ -738,15 +750,76 @@ Rules:
                 metadata: { type: 'fallback_summary', url: this.currentUrl }
             });
             
-        } catch (error) {
-            console.error('❌ Fallback analysis failed:', error);
-            this.removeTempMessage();
-            this.addMessageToChat('system', '⚠️ Unable to analyze this page automatically. The page may have crawling restrictions. You can still ask questions about this page and I\'ll try to help.');
+        } catch (fallbackError) {
+            console.error('❌ Fallback analysis also failed:', fallbackError);
+            
+            // Final fallback: Provide manual analysis based on URL
+            const manualAnalysis = this.generateManualAnalysis(this.currentUrl);
+            
+            this.addMessageToChat('agent', manualAnalysis);
             this.updateSiteStatus('ready');
+            this.showControls('completed');
+            
+            // Save manual analysis to storage
+            await this.storageManager.addMessageToHistory(this.currentSiteId, {
+                author: 'system',
+                text: `Auto-analysis started for: ${this.currentUrl}`,
+                timestamp: new Date().toISOString(),
+                metadata: { type: 'auto_analysis_start' }
+            });
+            
+            await this.storageManager.addMessageToHistory(this.currentSiteId, {
+                author: 'agent',
+                text: manualAnalysis,
+                timestamp: new Date().toISOString(),
+                metadata: { type: 'manual_analysis', url: this.currentUrl }
+            });
             
             setTimeout(() => {
-                this.hideAnimationSafely('fallback-failed');
+                this.hideAnimationSafely('manual-fallback');
             }, 1000);
+        }
+    }
+
+    generateManualAnalysis(url) {
+        try {
+            const urlObj = new URL(url);
+            const domain = urlObj.hostname;
+            const path = urlObj.pathname;
+            
+            // Generate basic analysis based on URL structure
+            let analysis = `[OVERVIEW]
+(Type): Website Analysis
+(Main Topic): ${domain} - ${path || 'Main Page'}
+(Target Audience): General Users
+
+[KEY HIGHLIGHTS]
+- Domain: ${domain}
+- Path: ${path || '/'}
+- Protocol: ${urlObj.protocol}
+- Analysis Method: Manual (crawling tool unavailable)
+
+[QUICK INSIGHTS]
+- This appears to be a website at ${domain}
+- The page structure suggests ${path ? 'a specific section' : 'main landing page'}
+- Manual analysis provided due to technical limitations with automated crawling
+- You can ask specific questions about this page for more detailed information`;
+
+            return analysis;
+        } catch (error) {
+            console.error('Error generating manual analysis:', error);
+            return `[OVERVIEW]
+(Type): Website Analysis
+(Main Topic): ${url}
+(Target Audience): General Users
+
+[KEY HIGHLIGHTS]
+- URL: ${url}
+- Analysis Method: Manual (crawling tool unavailable)
+
+[QUICK INSIGHTS]
+- Manual analysis provided due to technical limitations
+- You can ask specific questions about this page for more detailed information`;
         }
     }
 
@@ -905,7 +978,7 @@ Rules:
 
     removeCacheIndicator() {
         // Remove cache indicator message
-        const messages = document.querySelectorAll('.chat-message.system');
+        const messages = document.querySelectorAll('.message.system');
         messages.forEach(message => {
             if (message.textContent.includes('Loaded from cache')) {
                 message.remove();
@@ -996,12 +1069,24 @@ Rules:
             // Show typing indicator
             this.showTypingIndicator();
             
-            // Send question with URL context for on-demand crawling using smart fallback
-            const answer = await this.apiHandler.askQuestionWithSmartFallback(
-                this.currentSiteData.chat_id,
-                question,
-                this.currentUrl
-            );
+            // Check if this is a website analysis question or general chat
+            const isWebsiteAnalysisQuestion = this.isWebsiteAnalysisQuestion(question);
+            
+            let answer;
+            if (isWebsiteAnalysisQuestion) {
+                // Use website analysis with URL context
+                answer = await this.apiHandler.askQuestionWithSmartFallback(
+                    this.currentSiteData.chat_id,
+                    question,
+                    this.currentUrl
+                );
+            } else {
+                // Use normal chat without formatting requirements
+                answer = await this.apiHandler.askQuestion(
+                    this.currentSiteData.chat_id,
+                    question
+                );
+            }
             
             // Hide indicator and show answer
             this.hideTypingIndicator();
@@ -1035,6 +1120,31 @@ I'll attempt to provide useful information based on what I can access. If you ne
         }
     }
 
+    isWebsiteAnalysisQuestion(question) {
+        // Keywords that indicate website analysis is needed
+        const analysisKeywords = [
+            'analyze', 'analysis', 'what is this', 'describe this', 'explain this',
+            'what does this', 'tell me about', 'overview', 'summary', 'content',
+            'features', 'functionality', 'purpose', 'target audience', 'main topic',
+            'website', 'page', 'site', 'app', 'platform', 'service'
+        ];
+        
+        // Check if question contains analysis keywords
+        const lowerQuestion = question.toLowerCase();
+        const hasAnalysisKeywords = analysisKeywords.some(keyword => 
+            lowerQuestion.includes(keyword)
+        );
+        
+        // Check if question is very short (likely analysis request)
+        const isShortQuestion = question.length < 30;
+        
+        // Check if question is generic (like "help me", "can you help")
+        const isGenericQuestion = /^(can you|help me|what|how|tell me|explain|describe)/i.test(question);
+        
+        // Return true if it's likely a website analysis question
+        return hasAnalysisKeywords || (isShortQuestion && isGenericQuestion);
+    }
+
     createContextualQuestion(userQuestion) {
         // Tidak perlu lagi - akan menggunakan askQuestionWithContext dari API handler
         return userQuestion;
@@ -1046,24 +1156,87 @@ I'll attempt to provide useful information based on what I can access. If you ne
             console.error('❌ chatHistory element not found!');
             return;
         }
+
+        // Check for error messages that should redirect to main route
+        if (this.shouldRedirectToMainRoute(text)) {
+            console.log('🚨 Error detected, redirecting to main route');
+            this.redirectToMainRoute();
+            return;
+        }
+
         let formattedText = this.formatMessageText(text);
         // Jika agent, lakukan formatting khusus agar lebih rapi
         if (author === 'agent') {
             formattedText = this.formatAgentResult(text);
         }
         const messageDiv = document.createElement('div');
-        messageDiv.className = `chat-message ${author}`;
+        messageDiv.className = `message ${author}`;
         messageDiv.innerHTML = `
-            <div class="chat-message-author">${author === 'user' ? '👤 You' : author === 'agent' ? '🤖 AI' : 'ℹ️ System'}</div>
-            <div class="chat-message-text">${formattedText}</div>
+            <div class="message-author">${author === 'user' ? '👤 You' : author === 'agent' ? '🤖 AI' : ''}</div>
+            <div class="message-text">${formattedText}</div>
         `;
         this.chatHistory.appendChild(messageDiv);
         this.chatHistory.scrollTop = this.chatHistory.scrollHeight;
         
         // Verify message was actually added
-        const messageCount = this.chatHistory.querySelectorAll('.chat-message').length;
+        const messageCount = this.chatHistory.querySelectorAll('.message').length;
         console.log(`✅ Message added. Total messages in chat: ${messageCount}`);
     }
+
+    /**
+     * Check if message contains error that should redirect to main route
+     */
+    shouldRedirectToMainRoute(text) {
+        const errorPatterns = [
+            /temporary server error \(502\)/i,
+            /server error \(502\)/i,
+            /502 error/i,
+            /temporary server error/i,
+            /preventing access to the content/i,
+            /web crawler tool.*encountered.*error/i,
+            /unable to analyze.*webpage/i,
+            /crawler.*failed/i,
+            /access.*denied/i,
+            /blocked.*access/i
+        ];
+
+        return errorPatterns.some(pattern => pattern.test(text));
+    }
+
+    /**
+     * Redirect to main route when error is detected
+     */
+    redirectToMainRoute() {
+        console.log('🔄 Redirecting to main route due to error');
+        
+        // Clear current site data
+        this.currentSiteData = null;
+        this.currentSiteId = null;
+        this.currentUrl = null;
+        
+        // Clear chat history
+        if (this.chatHistory) {
+            this.chatHistory.innerHTML = '';
+        }
+        
+        // Show idle controls (main route)
+        this.showControls('idle');
+        
+        // Update domain display
+        if (this.currentDomainElement) {
+            this.currentDomainElement.textContent = 'Enter URL to analyze';
+        }
+        
+        // Update status
+        if (this.siteStatusElement) {
+            this.siteStatusElement.textContent = 'Ready to analyze';
+        }
+        
+        // Show message to user
+        this.addMessageToChat('system', '⚠️ Analysis failed due to server error. Please try again with a different URL or try again later.');
+    }
+
+
 
     /**
      * Format text message for better display
@@ -1128,7 +1301,7 @@ I'll attempt to provide useful information based on what I can access. If you ne
         });
         
         // Cek apakah ada pesan yang benar-benar muncul di UI
-        const visibleMessages = this.chatHistory.querySelectorAll('.chat-message');
+        const visibleMessages = this.chatHistory.querySelectorAll('.message');
         console.log(`🔍 UI Debug: Added ${visibleMessages.length} visible messages to DOM`);
         
         if (visibleMessages.length === 0) {
@@ -1439,14 +1612,17 @@ I'll attempt to provide useful information based on what I can access. If you ne
     formatAgentResult(text) {
         console.log('🔍 formatAgentResult called with text:', text.substring(0, 200) + '...');
         
-        // Normalization: remove double asterisks and extra spaces
+        // Normalization: remove double asterisks, extra spaces, and curly braces
         let html = text.replace(/\*\*/g, '').replace(/\r/g, '');
         
-        // Parse text to create structured badges
+        // Clean up curly braces from the entire text for better readability
+        html = this.cleanCurlyBraces(html);
+        
+        // Enhanced parsing with new formatting requirements
         const sections = [];
         
-        // Overview Section
-        const overviewMatch = html.match(/🎯\s*OVERVIEW:?/i);
+        // Overview Section - Support both old and new format
+        const overviewMatch = html.match(/(?:🎯\s*OVERVIEW|\[OVERVIEW\]):?/i);
         console.log('🎯 Overview match:', overviewMatch);
         if (overviewMatch) {
             const overviewContent = this.extractOverviewContent(html);
@@ -1456,8 +1632,8 @@ I'll attempt to provide useful information based on what I can access. If you ne
             }
         }
         
-        // Key Highlights Section
-        const highlightsMatch = html.match(/📝\s*KEY HIGHLIGHTS:?/i);
+        // Key Highlights Section - Support both old and new format
+        const highlightsMatch = html.match(/(?:📝\s*KEY HIGHLIGHTS|\[KEY HIGHLIGHTS\]):?/i);
         console.log('📝 Highlights match:', highlightsMatch);
         if (highlightsMatch) {
             const highlightsContent = this.extractHighlightsContent(html);
@@ -1467,8 +1643,8 @@ I'll attempt to provide useful information based on what I can access. If you ne
             }
         }
         
-        // Quick Insights Section
-        const insightsMatch = html.match(/💡\s*QUICK INSIGHTS:?/i);
+        // Quick Insights Section - Support both old and new format
+        const insightsMatch = html.match(/(?:💡\s*QUICK INSIGHTS|\[QUICK INSIGHTS\]):?/i);
         console.log('💡 Insights match:', insightsMatch);
         if (insightsMatch) {
             const insightsContent = this.extractInsightsContent(html);
@@ -1486,35 +1662,61 @@ I'll attempt to provide useful information based on what I can access. If you ne
             return sections.join('');
         }
         
-        // Fallback to old format if parsing fails
-        console.log('⚠️ No sections created, using fallback formatting');
-        return this.fallbackFormatting(html);
+        // Fallback to enhanced formatting if parsing fails
+        console.log('⚠️ No sections created, using enhanced fallback formatting');
+        return this.enhancedFallbackFormatting(html);
     }
     
     extractOverviewContent(text) {
-        const overviewRegex = /🎯\s*OVERVIEW:?([\s\S]*?)(?=📝|💡|$)/i;
+        const overviewRegex = /(?:🎯\s*OVERVIEW|\[OVERVIEW\]):?([\s\S]*?)(?=📝|💡|\[KEY HIGHLIGHTS\]|\[QUICK INSIGHTS\]|$)/i;
         const match = text.match(overviewRegex);
         if (!match) return null;
         
         const content = match[1].trim();
         const items = [];
         
-        // Extract Type, Main Topic, Target Audience with more flexible patterns
-        const typeMatch = content.match(/(?:Type|TYPE)\s*:?\s*(.+?)(?:\n|$)/i);
-        const topicMatch = content.match(/(?:Main Topic|MAIN TOPIC)\s*:?\s*(.+?)(?:\n|$)/i);
-        const audienceMatch = content.match(/(?:Target Audience|TARGET AUDIENCE)\s*:?\s*(.+?)(?:\n|$)/i);
+        // Enhanced extraction with support for new format (Sub Judul)
+        // Look for patterns like: (Type): value, (Main Topic): value, etc.
+        const enhancedTypeMatch = content.match(/\(Type\)\s*:?\s*(.+?)(?=\n|\(Main Topic\)|\(Target Audience\)|$)/i);
+        const enhancedTopicMatch = content.match(/\(Main Topic\)\s*:?\s*(.+?)(?=\n|\(Type\)|\(Target Audience\)|$)/i);
+        const enhancedAudienceMatch = content.match(/\(Target Audience\)\s*:?\s*(.+?)(?=\n|\(Type\)|\(Main Topic\)|$)/i);
         
-        if (typeMatch) items.push({ label: 'Type', value: typeMatch[1].trim() });
-        if (topicMatch) items.push({ label: 'Main Topic', value: topicMatch[1].trim() });
-        if (audienceMatch) items.push({ label: 'Target Audience', value: audienceMatch[1].trim() });
+        // Fallback to old format patterns
+        const typeMatch = enhancedTypeMatch || content.match(/(?:Type|TYPE)\s*:?\s*(.+?)(?=\n(?:Main Topic|MAIN TOPIC|Target Audience|TARGET AUDIENCE)|📝|💡|$)/i);
+        const topicMatch = enhancedTopicMatch || content.match(/(?:Main Topic|MAIN TOPIC)\s*:?\s*(.+?)(?=\n(?:Type|TYPE|Target Audience|TARGET AUDIENCE)|📝|💡|$)/i);
+        const audienceMatch = enhancedAudienceMatch || content.match(/(?:Target Audience|TARGET AUDIENCE)\s*:?\s*(.+?)(?=\n(?:Type|TYPE|Main Topic|MAIN TOPIC)|📝|💡|$)/i);
+        
+        if (typeMatch) {
+            const typeValue = typeMatch[1].trim();
+            // Remove curly braces if present and clean up
+            const cleanType = typeValue.replace(/[{}]/g, '').replace(/\s*-\s*.*$/, '').trim();
+            console.log('🔍 Type extracted:', { original: typeValue, cleaned: cleanType });
+            items.push({ label: 'Type', value: cleanType });
+        }
+        
+        if (topicMatch) {
+            const topicValue = topicMatch[1].trim();
+            // Remove curly braces if present and clean up
+            const cleanTopic = topicValue.replace(/[{}]/g, '').replace(/\s*-\s*.*$/, '').trim();
+            console.log('🔍 Main Topic extracted:', { original: topicValue, cleaned: cleanTopic });
+            items.push({ label: 'Main Topic', value: cleanTopic });
+        }
+        
+        if (audienceMatch) {
+            const audienceValue = audienceMatch[1].trim();
+            // Remove curly braces if present and clean up
+            const cleanAudience = audienceValue.replace(/[{}]/g, '').replace(/\s*-\s*.*$/, '').trim();
+            console.log('🔍 Target Audience extracted:', { original: audienceValue, cleaned: cleanAudience });
+            items.push({ label: 'Target Audience', value: cleanAudience });
+        }
         
         // If no structured items found, try to extract from plain text
         if (items.length === 0) {
             const lines = content.split('\n').filter(line => line.trim() && line.trim().length > 3);
             if (lines.length >= 3) {
-                items.push({ label: 'Type', value: lines[0].trim() });
-                items.push({ label: 'Main Topic', value: lines[1].trim() });
-                items.push({ label: 'Target Audience', value: lines[2].trim() });
+                items.push({ label: 'Type', value: lines[0].trim().replace(/[{}]/g, '').replace(/\s*-\s*.*$/, '') });
+                items.push({ label: 'Main Topic', value: lines[1].trim().replace(/[{}]/g, '').replace(/\s*-\s*.*$/, '') });
+                items.push({ label: 'Target Audience', value: lines[2].trim().replace(/[{}]/g, '').replace(/\s*-\s*.*$/, '') });
             }
         }
         
@@ -1522,7 +1724,7 @@ I'll attempt to provide useful information based on what I can access. If you ne
     }
     
     extractHighlightsContent(text) {
-        const highlightsRegex = /📝\s*KEY HIGHLIGHTS:?([\s\S]*?)(?=💡|$)/i;
+        const highlightsRegex = /(?:📝\s*KEY HIGHLIGHTS|\[KEY HIGHLIGHTS\]):?([\s\S]*?)(?=💡|\[QUICK INSIGHTS\]|$)/i;
         const match = text.match(highlightsRegex);
         if (!match) return null;
         
@@ -1537,22 +1739,35 @@ I'll attempt to provide useful information based on what I can access. If you ne
             cleanLine = cleanLine.replace(/^[-•*]\s*/, '');
             cleanLine = cleanLine.replace(/^[0-9]+\.\s*/, '');
             
-            if (cleanLine && cleanLine.length > 10) { // Minimum length for meaningful content
+            // Remove curly braces if present
+            cleanLine = cleanLine.replace(/[{}]/g, '').trim();
+            
+            // Remove duplicate explanations (everything after -)
+            cleanLine = cleanLine.replace(/\s*-\s*.*$/, '').trim();
+            
+            if (cleanLine && cleanLine.length > 5) { // Reduced minimum length for better content capture
                 items.push(cleanLine);
             }
         });
         
         // If no items found, try to split by sentences
         if (items.length === 0) {
-            const sentences = content.split(/[.!?]+/).filter(sentence => sentence.trim().length > 10);
-            items.push(...sentences.slice(0, 4)); // Max 4 highlights
+            const sentences = content.split(/[.!?]+/).filter(sentence => sentence.trim().length > 5);
+            items.push(...sentences.slice(0, 6)); // Increased max highlights
         }
         
-        return items;
+        // Ensure each item is a clear, separate point
+        return items.map(item => {
+            // Make sure each point ends with proper punctuation
+            if (!item.endsWith('.') && !item.endsWith('!') && !item.endsWith('?')) {
+                return item + '.';
+            }
+            return item;
+        });
     }
     
     extractInsightsContent(text) {
-        const insightsRegex = /💡\s*QUICK INSIGHTS:?([\s\S]*?)(?=\n\n|$)/i;
+        const insightsRegex = /(?:💡\s*QUICK INSIGHTS|\[QUICK INSIGHTS\]):?([\s\S]*?)(?=\n\n|$)/i;
         const match = text.match(insightsRegex);
         if (!match) return null;
         
@@ -1567,18 +1782,31 @@ I'll attempt to provide useful information based on what I can access. If you ne
             cleanLine = cleanLine.replace(/^[-•*]\s*/, '');
             cleanLine = cleanLine.replace(/^[0-9]+\.\s*/, '');
             
-            if (cleanLine && cleanLine.length > 10) { // Minimum length for meaningful content
+            // Remove curly braces if present
+            cleanLine = cleanLine.replace(/[{}]/g, '').trim();
+            
+            // Remove duplicate explanations (everything after -)
+            cleanLine = cleanLine.replace(/\s*-\s*.*$/, '').trim();
+            
+            if (cleanLine && cleanLine.length > 5) { // Reduced minimum length for better content capture
                 items.push(cleanLine);
             }
         });
         
         // If no items found, try to split by sentences
         if (items.length === 0) {
-            const sentences = content.split(/[.!?]+/).filter(sentence => sentence.trim().length > 10);
-            items.push(...sentences.slice(0, 3)); // Max 3 insights
+            const sentences = content.split(/[.!?]+/).filter(sentence => sentence.trim().length > 5);
+            items.push(...sentences.slice(0, 5)); // Increased max insights
         }
         
-        return items;
+        // Ensure each item is a clear, separate point
+        return items.map(item => {
+            // Make sure each point ends with proper punctuation
+            if (!item.endsWith('.') && !item.endsWith('!') && !item.endsWith('?')) {
+                return item + '.';
+            }
+            return item;
+        });
     }
     
     createOverviewBadge(items) {
@@ -1609,7 +1837,7 @@ I'll attempt to provide useful information based on what I can access. If you ne
         
         const itemsHtml = items.map(item => `
             <div class="badge-list-item">
-                <div class="badge-list-bullet"></div>
+                <div class="badge-list-bullet">●</div>
                 <div class="badge-list-text">${item}</div>
             </div>
         `).join('');
@@ -1634,7 +1862,7 @@ I'll attempt to provide useful information based on what I can access. If you ne
         
         const itemsHtml = items.map(item => `
             <div class="badge-list-item">
-                <div class="badge-list-bullet"></div>
+                <div class="badge-list-bullet">●</div>
                 <div class="badge-list-text">${item}</div>
             </div>
         `).join('');
@@ -1654,6 +1882,137 @@ I'll attempt to provide useful information based on what I can access. If you ne
         `;
     }
     
+    cleanCurlyBraces(text) {
+        // Remove curly braces and clean up the text
+        let cleaned = text
+            .replace(/\{([^}]*)\}/g, '$1') // Remove {content} -> content
+            .replace(/\s+/g, ' ') // Normalize multiple spaces
+            .trim();
+        
+        console.log('🧹 Cleaned curly braces from text');
+        return cleaned;
+    }
+
+    // Function to break long text into shorter lines
+    breakLongText(text, maxLength = 80) {
+        if (text.length <= maxLength) return text;
+        
+        // Split by natural break points
+        const words = text.split(' ');
+        const lines = [];
+        let currentLine = '';
+        
+        words.forEach(word => {
+            if ((currentLine + ' ' + word).length <= maxLength) {
+                currentLine += (currentLine ? ' ' : '') + word;
+            } else {
+                if (currentLine) lines.push(currentLine.trim());
+                currentLine = word;
+            }
+        });
+        
+        if (currentLine) lines.push(currentLine.trim());
+        
+        return lines.join('<br>');
+    }
+
+    // Enhanced bullet point detection and formatting
+    detectAndFormatBulletPoints(text) {
+        // Split text into lines
+        const lines = text.split('\n');
+        const formattedLines = [];
+        let inBulletList = false;
+        let bulletListItems = [];
+        
+        lines.forEach((line, index) => {
+            const trimmedLine = line.trim();
+            
+            // Check if line starts with bullet point indicators
+            const isBulletPoint = /^[-•*]\s*/.test(trimmedLine) || /^\d+\.\s*/.test(trimmedLine);
+            
+            if (isBulletPoint) {
+                if (!inBulletList) {
+                    inBulletList = true;
+                    // Close previous content if exists
+                    if (formattedLines.length > 0) {
+                        formattedLines.push('</div>');
+                    }
+                    formattedLines.push('<ul style="margin: 8px 0; padding-left: 20px;">');
+                }
+                
+                // Extract content after bullet point
+                const content = trimmedLine.replace(/^[-•*]\s*/, '').replace(/^\d+\.\s*/, '');
+                bulletListItems.push(`<li style="margin: 4px 0; padding-left: 8px;">${content}</li>`);
+            } else if (inBulletList && trimmedLine.length > 0) {
+                // Continue bullet list if line has content but no bullet
+                bulletListItems.push(`<li style="margin: 4px 0; padding-left: 8px;">${trimmedLine}</li>`);
+            } else if (inBulletList && trimmedLine.length === 0) {
+                // End bullet list if empty line
+                if (bulletListItems.length > 0) {
+                    formattedLines.push(bulletListItems.join(''));
+                    bulletListItems = [];
+                }
+                formattedLines.push('</ul>');
+                inBulletList = false;
+                formattedLines.push('<div style="margin-bottom: 12px;">');
+            } else {
+                // Regular text line
+                if (inBulletList) {
+                    // End bullet list
+                    if (bulletListItems.length > 0) {
+                        formattedLines.push(bulletListItems.join(''));
+                        bulletListItems = [];
+                    }
+                    formattedLines.push('</ul>');
+                    inBulletList = false;
+                }
+                
+                if (trimmedLine.length > 0) {
+                    formattedLines.push(`<div style="margin-bottom: 8px;">${trimmedLine}</div>`);
+                }
+            }
+        });
+        
+        // Close any remaining bullet list
+        if (inBulletList && bulletListItems.length > 0) {
+            formattedLines.push(bulletListItems.join(''));
+            formattedLines.push('</ul>');
+        }
+        
+        return formattedLines.join('');
+    }
+
+    // Enhanced title and subtitle detection
+    detectAndFormatTitles(text) {
+        let formatted = text;
+        
+        // Convert [JUDUL] format to proper headings with enhanced styling
+        formatted = formatted.replace(/\[([^\]]+)\]/g, function(match, title) {
+            // Check if it's a main section title
+            const isMainSection = /OVERVIEW|KEY HIGHLIGHTS|QUICK INSIGHTS|ANALYSIS|SUMMARY|CONCLUSION/i.test(title);
+            
+            if (isMainSection) {
+                return `<h3 style="margin: 20px 0 12px 0; color: #111827; font-weight: 700; font-size: 1.1em; border-bottom: 2px solid #3b82f6; padding-bottom: 8px;">${title}</h3>`;
+            } else {
+                return `<h4 style="margin: 16px 0 8px 0; color: #1f2937; font-weight: 600; border-left: 3px solid #3b82f6; padding-left: 12px;">${title}</h4>`;
+            }
+        });
+        
+        // Convert (Sub Judul) format to styled subtitles with better detection
+        formatted = formatted.replace(/\(([^)]+)\)/g, function(match, subtitle) {
+            // Check if it's a category label like Type, Main Topic, etc.
+            const isCategory = /Type|Main Topic|Target Audience|Category|Focus|Scope/i.test(subtitle);
+            
+            if (isCategory) {
+                return `<span style="color: #374151; font-weight: 600; font-size: 0.95em; background: #f3f4f6; padding: 2px 8px; border-radius: 4px; margin-right: 8px;">${subtitle}</span>`;
+            } else {
+                return `<span style="color: #6b7280; font-weight: 500; font-size: 0.9em; font-style: italic;">${subtitle}</span>`;
+            }
+        });
+        
+        return formatted;
+    }
+
     fallbackFormatting(html) {
         // Format lama sebagai fallback
         let formatted = html;
@@ -1678,6 +2037,22 @@ I'll attempt to provide useful information based on what I can access. If you ne
         formatted = formatted.replace(/<ul style="margin-top:0">\s*<\/ul>/g, '');
         // Hapus <li> kosong
         formatted = formatted.replace(/<li>\s*<\/li>/g, '');
+        return formatted;
+    }
+
+    enhancedFallbackFormatting(html) {
+        // Enhanced formatting for new format requirements
+        let formatted = html;
+        
+        // Use enhanced title and subtitle detection
+        formatted = this.detectAndFormatTitles(formatted);
+        
+        // Use enhanced bullet point detection
+        formatted = this.detectAndFormatBulletPoints(formatted);
+        
+        // Clean up any remaining formatting issues
+        formatted = formatted.replace(/\n\s*\n/g, '<br>');
+        
         return formatted;
     }
 }

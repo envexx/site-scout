@@ -132,6 +132,13 @@ IMPORTANT INSTRUCTIONS:
 5. If you encounter limitations, briefly mention them at the bottom and continue with what you can provide
 6. Focus on being helpful rather than explaining technical limitations
 
+RESPONSE FORMATTING REQUIREMENTS:
+- Use [JUDUL UTAMA] for main titles/sections
+- Use (Sub Judul) for subtitles and categories like "Type:", "Main Topic:", "Target Audience:"
+- Use bullet points (-) for lists and key points
+- Only use line breaks for bullet points, not for regular text
+- Structure your response with clear sections: [OVERVIEW], [KEY HIGHLIGHTS], [QUICK INSIGHTS]
+
 Please provide an accurate answer based on the content from that URL.`;
             
             return await this.sendMessage(chatId, contextualMessage);
@@ -142,10 +149,19 @@ Please provide an accurate answer based on the content from that URL.`;
     }
 
     /**
-     * Alias for compatibility with existing code
+     * Ask a general question without URL context (for normal chat)
      */
     async askQuestion(chatId, question) {
+        // For normal chat, send the question directly without special formatting
         return await this.sendMessage(chatId, question);
+    }
+
+    /**
+     * Send a simple message for normal chat (without formatting requirements)
+     */
+    async sendSimpleMessage(chatId, message) {
+        // For normal chat, send message directly without special formatting
+        return await this.sendMessage(chatId, message);
     }
 
     /**
@@ -174,6 +190,13 @@ IMPORTANT INSTRUCTIONS:
 5. If you encounter limitations, briefly mention them at the bottom and continue with what you can provide
 6. Focus on being helpful rather than explaining technical limitations
 
+RESPONSE FORMATTING REQUIREMENTS:
+- Use [JUDUL UTAMA] for main titles/sections
+- Use (Sub Judul) for subtitles and categories like "Type:", "Main Topic:", "Target Audience:"
+- Use bullet points (-) for lists and key points
+- Only use line breaks for bullet points, not for regular text
+- Structure your response with clear sections: [OVERVIEW], [KEY HIGHLIGHTS], [QUICK INSIGHTS]
+
 Please provide an accurate answer based on the content from that URL.`;
             
             return await this.sendMessage(chatId, contextualMessage);
@@ -191,7 +214,14 @@ Crawling Parameters:
 
 Question: ${question}
 
-IMPORTANT: If this still fails, provide helpful information based on what you can access. Don't give up with error messages.`;
+IMPORTANT: If this still fails, provide helpful information based on what you can access. Don't give up with error messages.
+
+RESPONSE FORMATTING REQUIREMENTS:
+- Use [JUDUL UTAMA] for main titles/sections
+- Use (Sub Judul) for subtitles and categories like "Type:", "Main Topic:", "Target Audience:"
+- Use bullet points (-) for lists and key points
+- Only use line breaks for bullet points, not for regular text
+- Structure your response with clear sections: [OVERVIEW], [KEY HIGHLIGHTS], [QUICK INSIGHTS]`;
 
                 return await this.sendMessage(chatId, fallbackMessage);
             } catch (depthError) {
@@ -210,6 +240,13 @@ Since automated crawling isn't working, please:
 3. Give a brief, helpful response
 4. If you have any relevant knowledge, share it
 5. Don't explain technical limitations in detail
+
+RESPONSE FORMATTING REQUIREMENTS:
+- Use [JUDUL UTAMA] for main titles/sections
+- Use (Sub Judul) for subtitles and categories like "Type:", "Main Topic:", "Target Audience:"
+- Use bullet points (-) for lists and key points
+- Only use line breaks for bullet points, not for regular text
+- Structure your response with clear sections: [OVERVIEW], [KEY HIGHLIGHTS], [QUICK INSIGHTS]
 
 Focus on being helpful to the user.`;
                     
